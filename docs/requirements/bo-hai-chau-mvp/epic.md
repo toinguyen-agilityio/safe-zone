@@ -1,0 +1,14 @@
+# Bo Hải Châu MVP: offline browser battle royale in Da Nang
+
+## Summary
+An offline browser battle-royale set in central Da Nang: 1 player plus 19 bots, a 5-7 minute match, rising flood water as the zone, one rifle, loot and healing food. Runs locally on desktop Chrome with Vietnamese in-game text. Built with the mandatory stack (Vite, TypeScript, three.js, Vitest, GitHub Actions CI). No deploy on the board; P1 requirements are deferred. Full PRD: `docs/requirements/bo-hai-chau-mvp/prd.md`.
+
+## Stories
+- M0 Setup: S-01 Project starts and shows a spinning box; S-02 Lint, formatting and unit tests run locally; S-03 CI builds and tests every pull request; S-04 Central config, seeded random numbers and a steady game loop
+- M1 Map: S-05 See the street grid and the Hàn river; S-06 Houses are generated per block, the same way for the same seed; S-07 Houses appear in the city and render efficiently; S-08 Three bridges cross the river; S-09 Dragon Bridge looks like a dragon; S-10 Hàn Market, Cock Church and Cham Museum landmarks
+- M2 Player: S-11 Look around and walk in first person; S-12 Pause and resume with Esc; S-13 Houses and map edge block the player; S-14 Walk up and down bridge ramps, and sink to the river bed; S-15 Sprint, jump and swim; S-16 Parachute into the map at the start of the match
+- M3 Combat: S-17 Fire the AK-Mía rifle; S-18 Shots hit targets and are blocked by houses; S-19 Recoil and spread depend on how you move; S-20 Aim down sights with the right mouse button; S-21 Take damage, armor absorbs it, and deaths are recorded; S-22 Visual feedback for shooting and being shot; S-23 Synthesized sound for shots, hits and pickups
+- M4 Bots: S-24 19 bots parachute in and land across the map; S-25 Bots spot the nearest enemy and attack it; S-26 Bots shoot with reaction time and imperfect aim; S-27 Bots move to the next dry zone; S-28 Bots free themselves when stuck on walls
+- M5 Zone: S-29 The flood zone has 5 phases that shrink around new centers; S-30 Standing in the flood drains health; S-31 Flood water covers the streets outside the zone; S-32 Screen overlay and announcements for the flood
+- M6 Loot & UI: S-33 Loot lies on the sidewalks and is picked up by walking over it; S-34 Eat banh mi and drink sugarcane juice to heal; S-35 HUD shows health, armor, ammo, items, players alive, kills and zone clock; S-36 Kill feed, pickup messages and banners; S-37 Minimap that turns with my view; S-38 Start screen with controls and a button to enter the match; S-39 Notice on touch devices that they are not supported; S-40 End screen with results and replay
+- M7 Release MVP: S-41 Measure and improve performance; S-42 Balance the match; S-43 Content review for legal and sensitivity rules; S-44 README with introduction, controls and how to run locally; S-45 Playtest with 5 people
