@@ -1,5 +1,4 @@
 dist
-node_modules
 .worktrees
 package-lock.json
 docs
