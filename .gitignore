@@ -1,2 +1,4 @@
 .worktrees/
 .squad/reports/
+node_modules/
+dist/
