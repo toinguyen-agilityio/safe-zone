@@ -27,7 +27,7 @@ ids:                              # filled in by setup; do not edit by hand
   wave_field_id: "PVTF_lAHOCGl6xs4BoVTuzhm16W0"
   agent_field_id: "PVTF_lAHOCGl6xs4BoVTuzhm16W4"
   attempts_field_id: "PVTF_lAHOCGl6xs4BoVTuzhm16W8"
-stack: ""                         # e.g. "Node 20, Next.js 14, PostgreSQL + Prisma, Vitest, Playwright";
+stack: "Vite, TypeScript, three.js, Vitest, ESLint + Prettier, GitHub Actions (CI), plain HTML/CSS, Web Audio"                       # e.g. "Node 20, Next.js 14, PostgreSQL + Prisma, Vitest, Playwright";
                                   # empty in a new repo: the Team Lead proposes one, the stakeholder decides
 language:
   artifacts: en                   # fixed: every document, issue and PR is in English
@@ -53,7 +53,7 @@ models:                           # model per dispatch (haiku | sonnet | opus); 
                                   # default. By the task's Complexity (low/medium/high, set by the
                                   # Team Lead); tasks without one use their Size (XS/S/M).
   dev: { low: sonnet, medium: sonnet, high: opus, XS: sonnet, S: sonnet, M: opus }
-  review: { low: sonnet, medium: opus, high: opus, XS: sonnet, S: opus, M: opus }
+  review: { low: sonnet, medium: sonnet, high: opus, XS: sonnet, S: sonnet, M: opus }
   qa: { low: sonnet, medium: sonnet, high: opus, XS: sonnet, S: sonnet, M: opus, story: opus }
   escalate_on_retry: true         # a task sent back by review or QA runs one tier higher
   rebase: sonnet
