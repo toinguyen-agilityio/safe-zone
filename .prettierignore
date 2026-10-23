@@ -1,0 +1,9 @@
+dist
+node_modules
+.worktrees
+package-lock.json
+docs
+.claude
+.squad
+CLAUDE.md
+README.md
