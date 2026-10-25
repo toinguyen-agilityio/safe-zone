@@ -62,6 +62,7 @@ describe('config', () => {
 
   it('defines bot and ui values', () => {
     expect(config.bots.count).toBe(19);
+    expect(config.bots.dropMargin).toBe(20);
     expect(config.ui.killFeedMax).toBe(5);
   });
 
