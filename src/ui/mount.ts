@@ -12,6 +12,8 @@ export interface UiContext {
   events: EventBus;
   player: Player;
   pause: Pause;
+  /** The display name of the player or a bot, for the kill feed. */
+  nameOf?: (id: string) => string;
   /** The player's health and armor, for the HUD. */
   health?: Health;
   /** The rifle and the bag, for the ammo and item counts. */

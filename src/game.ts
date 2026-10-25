@@ -256,6 +256,8 @@ export class Game {
       player: this.player,
       pause: this.pause,
       health: this.playerHealth,
+      nameOf: (id) =>
+        id === 'player' ? 'Bạn' : (this.bots.all.find((b) => b.id === id)?.name ?? id),
       weapon: this.weapon,
       inventory: this.inventory,
       zone: this.zone,
