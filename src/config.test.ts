@@ -84,6 +84,7 @@ describe('config', () => {
     expect(config.bots.zoneFightRange).toBe(40);
     expect(config.bots.underFireSeconds).toBe(3);
     expect(config.bots.stuck).toEqual({ progress: 0.5, seconds: 2, longSeconds: 6 });
+    expect(config.bots.unstick).toEqual({ probeStep: 0.6 });
     expect(config.bots.wanderSpeed).toBe(1.5);
     expect(config.bots.wanderTurnSeconds).toEqual({ min: 2, max: 5 });
     expect(config.ui.killFeedMax).toBe(5);

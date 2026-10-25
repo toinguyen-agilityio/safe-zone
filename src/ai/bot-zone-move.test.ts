@@ -91,10 +91,15 @@ describe('BotBrain heading for the zone', () => {
     const goal = { x: 0, z: -30 };
     brain.update(bot, null, [], 1, goal);
     expect(bot.z).toBeCloseTo(-config.bots.walkSpeed);
-    for (let t = 0; t < 20; t += 0.1) brain.update(bot, null, [], 0.1, goal);
-    expect(Math.hypot(bot.x - goal.x, bot.z - goal.z)).toBeLessThanOrEqual(
-      config.bots.arriveDistance + 1,
-    );
+    let guard = 0;
+    while (
+      Math.hypot(bot.x - goal.x, bot.z - goal.z) > config.bots.arriveDistance &&
+      guard++ < 400
+    ) {
+      brain.update(bot, null, [], 0.1, goal);
+    }
+    expect(brain.mode).toBe('travel');
+    brain.update(bot, null, [], 0.1, goal);
     expect(brain.mode).toBe('idle');
   });
 
