@@ -85,6 +85,7 @@ describe('config', () => {
   });
 
   it('defines zone values', () => {
+    expect(config.zone.startRadius).toBe(460);
     expect(config.zone.radii).toEqual([230, 130, 68, 30, 6]);
     expect(config.zone.drainStart).toBe(1);
     expect(config.zone.drainEnd).toBe(12);
