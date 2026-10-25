@@ -9,6 +9,8 @@ export const player = {
   eyeHeight: 1.7,
   /** Where the player stands before the parachute drop exists: a street crossing. */
   spawn: { x: 0, z: 0 },
+  /** Holding Shift multiplies the walking speed by this much. */
+  sprintMultiplier: 1.7,
   /** Downward pull in units per second squared. */
   gravity: 24,
   /** Upward speed at the start of a jump, in units per second. */
