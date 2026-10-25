@@ -14,6 +14,7 @@ import { createRenderer } from './render/renderer';
 import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
 import { FireControl } from './systems/fire-control';
+import { connectShotResolution, createShotObstacles, type Target } from './systems/shot';
 import { createMotionWorld, updatePlayerMotion } from './systems/player-motion';
 import { getLayout } from './world/layout';
 
@@ -36,6 +37,8 @@ export class Game {
   readonly pause = new Pause();
   readonly input: Input;
   readonly weapon = new Weapon();
+  /** Everyone a shot can hit besides the player. */
+  readonly targets: Target[] = [];
   readonly player = createParachutingPlayer(config.world.defaultSeed);
   private readonly loop: GameLoop;
 
@@ -51,6 +54,11 @@ export class Game {
     this.scene.add(buildWorldScene(getLayout()));
     this.input = new Input(document, this.renderer.domElement);
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
+    // There are no targets yet: bots add themselves to this list when they exist.
+    connectShotResolution(this.events, {
+      obstacles: createShotObstacles(getLayout()),
+      targets: () => this.targets,
+    });
     const fireControl = new FireControl(this.weapon, this.player, this.input, this.events);
     const motionWorld = createMotionWorld(getLayout());
     const canopy = buildCanopy();
