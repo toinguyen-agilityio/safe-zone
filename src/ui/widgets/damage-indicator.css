@@ -1,0 +1,20 @@
+/* A red arc around the crosshair; it is turned toward the shooter and fades out. */
+.damage-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  height: 280px;
+  margin: -140px 0 0 -140px;
+  box-sizing: border-box;
+  border: 10px solid transparent;
+  border-top-color: rgba(255, 70, 60, 0.85);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+.damage-indicator.damage-indicator-show {
+  opacity: 1;
+  transition: none;
+}
