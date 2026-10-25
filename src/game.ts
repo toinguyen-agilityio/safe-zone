@@ -1,10 +1,13 @@
 import { PerspectiveCamera, Scene, type WebGLRenderer } from 'three';
 import { config } from './config';
 import { GameLoop } from './core/loop';
-import { placeOverheadCamera } from './render/overhead-camera';
+import { Input } from './core/input';
+import { createPlayer, updatePlayer } from './entities/player';
+import { applyPlayerToCamera } from './render/first-person-camera';
 import { createFpsMeter } from './ui/fps-meter';
 import { createRenderer } from './render/renderer';
 import { buildWorldScene } from './render/world-scene';
+import { readMoveKeys } from './systems/movement';
 import { getLayout } from './world/layout';
 
 export type UpdateFn = (dt: number) => void;
@@ -15,6 +18,8 @@ export class Game {
   readonly camera = new PerspectiveCamera(60, 1, 0.1, 1000);
   readonly renderer: WebGLRenderer;
   private readonly updates: UpdateFn[] = [];
+  readonly input: Input;
+  readonly player = createPlayer();
   private readonly loop: GameLoop;
 
   constructor(private readonly container: HTMLElement) {
@@ -29,7 +34,21 @@ export class Game {
     window.addEventListener('resize', () => this.resize());
     document.addEventListener('visibilitychange', () => this.loop.resetClock());
     this.scene.add(buildWorldScene(getLayout()));
-    placeOverheadCamera(this.camera, config.world.mapSize);
+    this.input = new Input(document, this.renderer.domElement);
+    // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
+    this.addUpdate((dt) => {
+      updatePlayer(
+        this.player,
+        {
+          keys: readMoveKeys(this.input),
+          mouseDelta: this.input.consumeMouseDelta(),
+          locked: this.input.pointerLocked,
+        },
+        dt,
+      );
+      applyPlayerToCamera(this.camera, this.player);
+    });
+    applyPlayerToCamera(this.camera, this.player);
     const fps = createFpsMeter(window.location.search, container);
     if (fps) this.addUpdate((dt) => fps.update(dt));
     this.resize();

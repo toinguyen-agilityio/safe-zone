@@ -3,6 +3,10 @@ export const player = {
   armorMax: 60,
   armorBlock: 0.45,
   parachuteStartHeight: 75,
+  /** Height of the eyes above the ground. */
+  eyeHeight: 1.7,
+  /** Where the player stands before the parachute drop exists: a street crossing. */
+  spawn: { x: 0, z: 0 },
   /** Walking speed in world units per second. */
   walkSpeed: 5,
   /** Radians of turn per pixel of mouse movement. */

@@ -18,9 +18,11 @@ const setup = () => {
   const doc = new FakeDocument();
   const element = new FakeElement();
   const input = new Input(doc, element);
-  const lock = () => {
+  /** Locks the pointer. `settle` sends the jumpy first event browsers may report right after. */
+  const lock = (settle = true) => {
     doc.pointerLockElement = element;
     doc.dispatchEvent(event('pointerlockchange'));
+    if (settle) doc.dispatchEvent(event('mousemove', { movementX: -500, movementY: -350 }));
   };
   const unlock = () => {
     doc.pointerLockElement = null;
@@ -81,6 +83,25 @@ describe('Input mouse', () => {
     lock();
     doc.dispatchEvent(event('mousemove', { movementX: 5, movementY: 5 }));
     unlock();
+    expect(input.consumeMouseDelta()).toEqual({ x: 0, y: 0 });
+  });
+});
+
+describe('Input first move after lock', () => {
+  it('ignores the jumpy first mouse event after the lock starts', () => {
+    const { doc, input, lock } = setup();
+    lock(false);
+    doc.dispatchEvent(event('mousemove', { movementX: -500, movementY: -350 }));
+    doc.dispatchEvent(event('mousemove', { movementX: 2, movementY: 3 }));
+    expect(input.consumeMouseDelta()).toEqual({ x: 2, y: 3 });
+  });
+
+  it('ignores it again after a second lock', () => {
+    const { doc, input, lock, unlock } = setup();
+    lock();
+    unlock();
+    lock(false);
+    doc.dispatchEvent(event('mousemove', { movementX: 900, movementY: 900 }));
     expect(input.consumeMouseDelta()).toEqual({ x: 0, y: 0 });
   });
 });
