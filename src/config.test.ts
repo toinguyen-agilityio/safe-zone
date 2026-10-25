@@ -111,6 +111,7 @@ describe('config', () => {
     expect(config.loot.carryLimit).toEqual({ banhMi: 5, sugarcaneJuice: 3, ammo: 180 });
     expect(config.loot.ammoBoxAmount).toBe(30);
     expect(config.loot.raincoatArmor).toBe(60);
+    expect(config.loot.healMoveMultiplier).toBe(0.4);
     expect(config.loot.banhMi).toEqual({ healAmount: 30, healSeconds: 2 });
     expect(config.loot.sugarcaneJuice).toEqual({
       healAmount: 15,

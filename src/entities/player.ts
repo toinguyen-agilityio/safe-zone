@@ -33,6 +33,8 @@ export interface PlayerInput {
   locked: boolean;
   /** Space is held. Optional so callers that do not jump can leave it out. */
   jump?: boolean;
+  /** Scales the walking speed, for example while healing. Optional; 1 when left out. */
+  speedMultiplier?: number;
 }
 
 export function createPlayer(): Player {
@@ -59,8 +61,9 @@ export function updatePlayer(player: Player, input: PlayerInput, dt: number): vo
   player.pitch = look.pitch;
 
   const velocity = moveVelocity(input.keys, player.yaw, player.swimming);
-  player.x += velocity.x * dt;
-  player.z += velocity.z * dt;
+  const scale = input.speedMultiplier ?? 1;
+  player.x += velocity.x * scale * dt;
+  player.z += velocity.z * scale * dt;
 }
 
 /** Where a match starts: a seeded spot over the map, high up under the parachute. */

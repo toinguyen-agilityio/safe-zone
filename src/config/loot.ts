@@ -12,6 +12,8 @@ export const loot = {
   ammoBoxAmount: 30,
   /** Armor points a raincoat gives, up to the most that can be worn. */
   raincoatArmor: 60,
+  /** Walking speed multiplier while eating or drinking. */
+  healMoveMultiplier: 0.4,
   banhMi: { healAmount: 30, healSeconds: 2 },
   sugarcaneJuice: {
     healAmount: 15,
