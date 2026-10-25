@@ -27,6 +27,10 @@ export const bots = {
   fireIntervalSeconds: 0.4,
   /** Where a bot's hits land: this share on the head, this on the torso, the rest on the legs. */
   regionOdds: { head: 0.1, torso: 0.6 },
+  /** A fighting bot sidesteps at this speed, in units per second. */
+  strafeSpeed: 2.5,
+  /** Seconds between a strafing bot's changes of direction (min, max). */
+  strafeTurnSeconds: { min: 0.8, max: 2.2 },
   /** With nobody in sight a bot ambles around at this speed. */
   wanderSpeed: 1.5,
   /** Seconds between a wandering bot's changes of direction (min, max). */

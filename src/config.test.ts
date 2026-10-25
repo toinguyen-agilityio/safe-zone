@@ -77,6 +77,8 @@ describe('config', () => {
     });
     expect(config.bots.fireIntervalSeconds).toBe(0.4);
     expect(config.bots.regionOdds).toEqual({ head: 0.1, torso: 0.6 });
+    expect(config.bots.strafeSpeed).toBe(2.5);
+    expect(config.bots.strafeTurnSeconds).toEqual({ min: 0.8, max: 2.2 });
     expect(config.bots.wanderSpeed).toBe(1.5);
     expect(config.bots.wanderTurnSeconds).toEqual({ min: 2, max: 5 });
     expect(config.ui.killFeedMax).toBe(5);
