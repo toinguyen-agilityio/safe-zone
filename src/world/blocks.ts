@@ -1,4 +1,5 @@
 import { riverCenterX } from './layout';
+import { getLandmarks, reservedArea } from './landmarks';
 import type { Layout, Rect } from './types';
 
 type Interval = [number, number];
@@ -28,10 +29,39 @@ function westBankMin(layout: Layout, z0: number, z1: number): number {
   return Math.min(min, riverCenterX(z1) - half);
 }
 
+/** What is left of a block after cutting a rectangular hole out of it, as up to four strips. */
+function subtract(block: Rect, hole: Rect): Rect[] {
+  const b = {
+    x0: block.cx - block.width / 2,
+    x1: block.cx + block.width / 2,
+    z0: block.cz - block.depth / 2,
+    z1: block.cz + block.depth / 2,
+  };
+  const h = {
+    x0: hole.cx - hole.width / 2,
+    x1: hole.cx + hole.width / 2,
+    z0: hole.cz - hole.depth / 2,
+    z1: hole.cz + hole.depth / 2,
+  };
+  if (h.x0 >= b.x1 || h.x1 <= b.x0 || h.z0 >= b.z1 || h.z1 <= b.z0) return [block];
+
+  const pieces: Rect[] = [];
+  const add = (x0: number, x1: number, z0: number, z1: number) => {
+    if (x1 - x0 > 1e-9 && z1 - z0 > 1e-9) pieces.push(rectFromBounds(x0, x1, z0, z1));
+  };
+  const hx0 = Math.max(h.x0, b.x0);
+  const hx1 = Math.min(h.x1, b.x1);
+  add(b.x0, hx0, b.z0, b.z1);
+  add(hx1, b.x1, b.z0, b.z1);
+  add(hx0, hx1, b.z0, Math.max(h.z0, b.z0));
+  add(hx0, hx1, Math.min(h.z1, b.z1), b.z1);
+  return pieces;
+}
+
 /**
  * Rectangular blocks between the streets, west of the river. The strip next to the
  * river stops at the lowest bank point of each row and leaves bridge decks free.
- * Land east of the river is left empty.
+ * Land east of the river is left empty. Landmark footprints are cut out of the blocks.
  */
 export function computeBlocks(layout: Layout): Rect[] {
   const half = layout.size / 2;
@@ -78,5 +108,6 @@ export function computeBlocks(layout: Layout): Rect[] {
       }
     }
   }
-  return blocks;
+  const holes = getLandmarks(layout).map(reservedArea);
+  return holes.reduce((current, hole) => current.flatMap((block) => subtract(block, hole)), blocks);
 }

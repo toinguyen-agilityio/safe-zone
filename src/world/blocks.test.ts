@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { computeBlocks } from './blocks';
+import { getLandmarks, reservedArea } from './landmarks';
 import { getLayout, riverCenterX } from './layout';
 import type { Rect } from './types';
 
@@ -7,6 +8,7 @@ const layout = getLayout();
 const blocks = computeBlocks(layout);
 const half = layout.size / 2;
 const halfRiver = layout.river.width / 2;
+const reserved = getLandmarks(layout).map(reservedArea);
 
 const bounds = (r: Rect) => ({
   x0: r.cx - r.width / 2,
@@ -78,7 +80,8 @@ describe('computeBlocks', () => {
     for (let x = -half + 1; x < lowestBank; x += 4) {
       for (let z = -half + 1; z < half; z += 4) {
         const onStreet = layout.streets.some((s) => contains(s, x, z));
-        if (onStreet || nearBridge(z)) continue;
+        const onLandmark = reserved.some((r) => contains(r, x, z));
+        if (onStreet || nearBridge(z) || onLandmark) continue;
         expect(blocks.some((b) => contains(b, x, z))).toBe(true);
       }
     }

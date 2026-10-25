@@ -54,6 +54,11 @@ export const world = {
   bridgePillarSpacing: 18,
   bridgePillarRadius: 1.2,
   bridgeRailingHeight: 1.1,
+  landmarks: {
+    /** Open ground kept around each landmark so no house touches it. */
+    margin: 2,
+    heights: { hanMarket: 14, cockChurch: 42, chamMuseum: 12 },
+  },
   dragon: {
     /** How far the dragon floats above the bridge surface. */
     clearance: 4.5,
