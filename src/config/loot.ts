@@ -2,6 +2,8 @@ export const loot = {
   itemCount: 150,
   /** Items lie on the street edge, this far from the street's centre line (min, max). */
   sidewalkOffset: { min: 4.5, max: 6.5 },
+  /** Walking this close to an item picks it up. */
+  pickupRadius: 1.5,
   /** Items keep at least this far from houses, landmarks, the river and each other. */
   clearance: 1,
   minSpacing: 6,
