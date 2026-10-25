@@ -8,6 +8,8 @@ export const bots = {
   engageRange: 25,
   /** Once engaged, the target must get this far away before the bot chases again. */
   disengageRange: 30,
+  /** Seconds a bot waits after first seeing an enemy before it may shoot. */
+  reactionSeconds: 0.5,
   /** With nobody in sight a bot ambles around at this speed. */
   wanderSpeed: 1.5,
   /** Seconds between a wandering bot's changes of direction (min, max). */
