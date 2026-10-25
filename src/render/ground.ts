@@ -6,7 +6,12 @@ import {
   Mesh,
   MeshStandardMaterial,
   PlaneGeometry,
+  DoubleSide,
+  Shape,
+  ShapeGeometry,
 } from 'three';
+import { config } from '../config';
+import { riverBanks, type Bank } from './river';
 import type { Layout, Street } from '../world/types';
 
 const GRASS_COLOR = 0x4f7f3a;
@@ -20,10 +25,20 @@ const DASH_WIDTH = 0.4;
 const STREET_Y = 0.15;
 const MARKING_Y = 0.3;
 
+/** Pulls a layer toward the camera so it wins the depth test against the ground below it. */
+function layerMaterial(color: number, offset: number): MeshStandardMaterial {
+  return new MeshStandardMaterial({
+    color,
+    polygonOffset: true,
+    polygonOffsetFactor: -offset,
+    polygonOffsetUnits: -offset,
+  });
+}
+
 function flatMesh(width: number, depth: number, color: number, y: number): Mesh {
   const mesh = new Mesh(
     new PlaneGeometry(width, depth).rotateX(-Math.PI / 2),
-    new MeshStandardMaterial({ color }),
+    layerMaterial(color, 4),
   );
   mesh.position.y = y;
   return mesh;
@@ -61,23 +76,38 @@ function markingsMesh(streets: Street[], orientation: Street['orientation']): In
     orientation === 'east-west'
       ? new BoxGeometry(DASH_LENGTH, 0.02, DASH_WIDTH)
       : new BoxGeometry(DASH_WIDTH, 0.02, DASH_LENGTH);
-  const mesh = new InstancedMesh(
-    geometry,
-    new MeshStandardMaterial({ color: MARKING_COLOR }),
-    matrices.length,
-  );
+  const mesh = new InstancedMesh(geometry, layerMaterial(MARKING_COLOR, 8), matrices.length);
   matrices.forEach((m, i) => mesh.setMatrixAt(i, m));
   mesh.name = 'markings';
   return mesh;
+}
+
+/** Shape coordinates are (x, -z): rotating the geometry by -90 degrees about x maps y to -z. */
+function grassShape(bank: Bank, outerX: number, limit: number): Shape {
+  const shape = new Shape();
+  shape.moveTo(outerX, -limit);
+  shape.lineTo(outerX, limit);
+  for (let i = 0; i < bank.zs.length; i++) shape.lineTo(bank.xs[i]!, -bank.zs[i]!);
+  shape.closePath();
+  return shape;
+}
+
+function grassMeshes(layout: Layout): Mesh[] {
+  const limit = layout.size / 2 + config.world.edgePadding;
+  const { west, east } = riverBanks(layout);
+  const material = new MeshStandardMaterial({ color: GRASS_COLOR, side: DoubleSide });
+  return [grassShape(west, -limit, limit), grassShape(east, limit, limit)].map((shape) => {
+    const mesh = new Mesh(new ShapeGeometry(shape).rotateX(-Math.PI / 2), material);
+    mesh.name = 'grass';
+    return mesh;
+  });
 }
 
 export function buildGround(layout: Layout): Group {
   const group = new Group();
   group.name = 'ground';
 
-  const grass = flatMesh(layout.size, layout.size, GRASS_COLOR, 0);
-  grass.name = 'grass';
-  group.add(grass);
+  for (const grass of grassMeshes(layout)) group.add(grass);
 
   for (const street of layout.streets) group.add(streetMesh(street));
   group.add(markingsMesh(layout.streets, 'north-south'));

@@ -6,6 +6,8 @@ describe('config', () => {
     expect(config.world.mapSize).toBe(640);
     expect(typeof config.world.defaultSeed).toBe('number');
     expect(config.world.maxDt).toBe(0.05);
+    expect(config.world.river.bedDepth).toBeGreaterThan(0);
+    expect(config.world.river.waterLevel).toBeLessThan(0);
   });
 
   it('defines player values', () => {

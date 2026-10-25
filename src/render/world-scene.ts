@@ -1,6 +1,7 @@
 import { AmbientLight, DirectionalLight, Group } from 'three';
 import type { Layout } from '../world/types';
 import { buildGround } from './ground';
+import { buildRiver } from './river';
 
 /** The single place render tasks add their parts of the world. */
 export function buildWorldScene(layout: Layout): Group {
@@ -13,5 +14,6 @@ export function buildWorldScene(layout: Layout): Group {
   root.add(sun);
 
   root.add(buildGround(layout));
+  root.add(buildRiver(layout));
   return root;
 }

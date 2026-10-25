@@ -14,7 +14,11 @@ export const world = {
     curveLength: 90,
     width: 50,
     sampleStep: 40,
+    bedDepth: 4,
+    waterLevel: -1.2,
   },
+  /** Ground and river continue this far past the map edge so no gap shows. */
+  edgePadding: 100,
   bridgeDeckWidth: 16,
   bridgeZs: { han: -120, dragon: 40, tranThiLy: 200 },
   bridgeRampLength: 30,
