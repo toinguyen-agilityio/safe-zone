@@ -13,7 +13,9 @@ import { mountUi } from './ui/mount';
 import { createRenderer } from './render/renderer';
 import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
+import { createRng } from './core/rng';
 import { FireControl } from './systems/fire-control';
+import { Recoil } from './systems/recoil';
 import { connectShotResolution, createShotObstacles, type Target } from './systems/shot';
 import { createMotionWorld, updatePlayerMotion } from './systems/player-motion';
 import { getLayout } from './world/layout';
@@ -59,7 +61,19 @@ export class Game {
       obstacles: createShotObstacles(getLayout()),
       targets: () => this.targets,
     });
-    const fireControl = new FireControl(this.weapon, this.player, this.input, this.events);
+    const fireControl = new FireControl(this.weapon, this.player, this.input, this.events, {
+      rng: createRng(config.world.defaultSeed ^ 0x5407),
+      recoil: new Recoil(),
+      spreadState: () => {
+        const keys = readMoveKeys(this.input);
+        const walking = keys.forward || keys.back || keys.left || keys.right;
+        return {
+          moving: walking && !this.player.airborne,
+          airborne: this.player.airborne,
+          aiming: this.input.isMouseDown(2),
+        };
+      },
+    });
     const motionWorld = createMotionWorld(getLayout());
     const canopy = buildCanopy();
     this.scene.add(canopy);

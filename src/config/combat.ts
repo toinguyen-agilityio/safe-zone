@@ -12,6 +12,15 @@ export const combat = {
     /** Aiming down the sights multiplies the spread by this, so it shrinks. */
     aimMultiplier: 0.4,
   },
+  /** The rifle kicks the view up with each shot and settles back after the trigger is released. */
+  recoil: {
+    kickDegrees: 0.7,
+    /** The view never climbs more than this far above where it started. */
+    maxDegrees: 10,
+    recoverDegreesPerSecond: 8,
+    /** Seconds after the last shot before the view starts to settle. */
+    recoverDelaySeconds: 0.12,
+  },
   /** A shot reaches this far. */
   maxShotDistance: 400,
   /** Seconds between two shots while the trigger is held (10 rounds per second). */

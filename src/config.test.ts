@@ -40,6 +40,12 @@ describe('config', () => {
       headMultiplier: 2,
       bodyDamage: 25,
       spread: { standingDegrees: 0.3, movingDegrees: 1.5, airborneDegrees: 4, aimMultiplier: 0.4 },
+      recoil: {
+        kickDegrees: 0.7,
+        maxDegrees: 10,
+        recoverDegreesPerSecond: 8,
+        recoverDelaySeconds: 0.12,
+      },
       maxShotDistance: 400,
       fireIntervalSeconds: 0.1,
       startingReserve: 90,
