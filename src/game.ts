@@ -31,7 +31,8 @@ import { connectDamage } from './systems/damage-system';
 import { KillLog } from './systems/kill-log';
 import { FireControl } from './systems/fire-control';
 import { Recoil } from './systems/recoil';
-import { connectShotResolution, createShotObstacles, type Target } from './systems/shot';
+import { BotSystem } from './systems/bot-system';
+import { connectShotResolution, createShotObstacles } from './systems/shot';
 import { createMotionWorld, updatePlayerMotion } from './systems/player-motion';
 import { getLayout } from './world/layout';
 import { generateLoot } from './world/loot-spawn';
@@ -57,11 +58,11 @@ export class Game {
   readonly weapon = new Weapon();
   /** Right mouse button: raises the rifle to the eye and narrows the view. */
   readonly aim = new Aim();
-  /** Everyone a shot can hit besides the player. */
-  readonly targets: Target[] = [];
   readonly player = createParachutingPlayer(config.world.defaultSeed);
   readonly playerHealth = new Health();
   readonly kills: KillLog;
+  /** The 19 opponents; they drop in together with the player. */
+  readonly bots: BotSystem;
   readonly inventory = new Inventory(this.playerHealth);
   /** The items still lying on the sidewalks. */
   readonly pickups: PickupSystem;
@@ -95,16 +96,17 @@ export class Game {
     installAudio(document);
     connectSounds(this.events);
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
-    // There are no targets yet: bots add themselves to this list when they exist.
+    const motionWorld = createMotionWorld(getLayout());
+    this.bots = BotSystem.create(config.world.defaultSeed, this.scene, motionWorld);
     connectShotResolution(this.events, {
       obstacles: createShotObstacles(getLayout()),
-      targets: () => this.targets,
+      targets: () => this.bots.alive,
     });
     connectDamage(this.events, {
       entity: (id) =>
         id === 'player'
           ? { id, health: this.playerHealth, onKilled: () => (this.player.dead = true) }
-          : undefined,
+          : this.bots.damageable(id),
       kills: this.kills,
       now: () => this.elapsed,
     });
@@ -122,11 +124,11 @@ export class Game {
         };
       },
     });
-    const motionWorld = createMotionWorld(getLayout());
     const canopy = buildCanopy();
     this.scene.add(canopy);
     this.addUpdate((dt) => {
       this.elapsed += dt;
+      this.bots.update(dt);
       tracers.update(dt);
       flash.update(dt);
       updatePlayerMotion(
