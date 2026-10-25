@@ -2,6 +2,10 @@ export const combat = {
   magazineSize: 30,
   reloadSeconds: 1.8,
   headMultiplier: 2,
+  /** Damage of one rifle bullet to the torso or the legs. A head shot does this times the head multiplier. */
+  bodyDamage: 25,
+  /** A shot reaches this far. */
+  maxShotDistance: 400,
   /** Seconds between two shots while the trigger is held (10 rounds per second). */
   fireIntervalSeconds: 0.1,
   /** Reserve ammo the player starts the match with, on top of the full magazine. */
