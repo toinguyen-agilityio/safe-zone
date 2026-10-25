@@ -49,4 +49,9 @@ export const world = {
   bridgeDeckWidth: 16,
   bridgeZs: { han: -120, dragon: 40, tranThiLy: 200 },
   bridgeRampLength: 30,
+  /** Deck height above the ground, so boats and water pass below. */
+  bridgeDeckHeight: 6,
+  bridgePillarSpacing: 18,
+  bridgePillarRadius: 1.2,
+  bridgeRailingHeight: 1.1,
 } as const;
