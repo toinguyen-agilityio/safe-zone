@@ -75,6 +75,9 @@ describe('config', () => {
 
   it('defines loot values', () => {
     expect(config.loot.itemCount).toBe(150);
+    expect(config.loot.sidewalkOffset).toEqual({ min: 4.5, max: 6.5 });
+    expect(config.loot.clearance).toBe(1);
+    expect(config.loot.minSpacing).toBe(6);
     expect(config.loot.carryLimit).toEqual({ banhMi: 5, sugarcaneJuice: 3, ammo: 180 });
     expect(config.loot.ammoBoxAmount).toBe(30);
     expect(config.loot.raincoatArmor).toBe(60);
