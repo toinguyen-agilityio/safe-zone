@@ -27,6 +27,13 @@ export class Inventory {
     return true;
   }
 
+  /** Put some of a stock in the bag without picking anything up, for example the starting ammo. Returns how many fit. */
+  give(stock: Stock, amount: number): number {
+    const fit = Math.max(0, Math.min(amount, carryLimit(stock) - this.counts[stock]));
+    this.counts[stock] += fit;
+    return fit;
+  }
+
   /** Spend one of a stock, for example when eating. Returns false when there is none. */
   take(stock: Stock, amount = 1): boolean {
     if (this.counts[stock] < amount) return false;

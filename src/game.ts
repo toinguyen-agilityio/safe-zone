@@ -9,6 +9,7 @@ import { installAudio } from './audio/audio-context';
 import { connectSounds } from './audio/sound-system';
 import { Health } from './entities/health';
 import { Inventory } from './entities/inventory';
+import { AmmoSync } from './systems/ammo-sync';
 import { Healing } from './systems/healing';
 import { HealingSystem } from './systems/healing-system';
 import { Weapon } from './entities/weapon';
@@ -141,6 +142,7 @@ export class Game {
       this.input,
       this.events,
     );
+    const ammoSync = new AmmoSync(this.weapon, this.inventory);
     this.pickups = new PickupSystem(generateLoot(getLayout()), this.events);
     // The items lie on the sidewalks until someone walks over them.
     const loot = new LootRenderer(this.pickups.items);
@@ -234,6 +236,7 @@ export class Game {
         this.pickups.update(this.player, this.inventory);
       }
       const shots = fireControl.update(dt, this.input.pointerLocked);
+      ammoSync.update();
       this.healing.update(dt, {
         locked: this.input.pointerLocked,
         shots,
@@ -253,6 +256,8 @@ export class Game {
       player: this.player,
       pause: this.pause,
       health: this.playerHealth,
+      weapon: this.weapon,
+      inventory: this.inventory,
       zone: this.zone,
       requestPointerLock: () => this.renderer.domElement.requestPointerLock(),
     });

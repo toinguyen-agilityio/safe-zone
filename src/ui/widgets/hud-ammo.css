@@ -1,0 +1,39 @@
+.hud-ammo {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.hud-ammo-count {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hud-ammo-reserve {
+  font-size: 24px;
+  opacity: 0.8;
+}
+
+.hud-ammo-state {
+  min-height: 18px;
+  font-size: 14px;
+  color: #ffd400;
+}
+
+.hud-items {
+  display: flex;
+  gap: 14px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.hud-ammo.hud-ammo-empty .hud-ammo-count {
+  color: #ff5a4a;
+}
