@@ -1,0 +1,9 @@
+.minimap {
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  background: rgba(20, 30, 40, 0.8);
+}
