@@ -35,6 +35,10 @@ export const bots = {
   zoneWarningSeconds: 20,
   /** A bot walking to a destination is there when it is this close. */
   arriveDistance: 2,
+  /** A bot on its way to the zone still stops to fight an enemy this close. */
+  zoneFightRange: 40,
+  /** A bot that took damage counts as under fire for this many seconds. */
+  underFireSeconds: 3,
   /** With nobody in sight a bot ambles around at this speed. */
   wanderSpeed: 1.5,
   /** Seconds between a wandering bot's changes of direction (min, max). */

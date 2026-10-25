@@ -32,6 +32,9 @@ export class BotBrain {
   mode: BotMode = 'idle';
   private heading = 0;
   private turnLeft = 0;
+  /** Health and armor at the last update, to notice damage. */
+  private lastHealth: number | null = null;
+  private underFireLeft = 0;
 
   private readonly strafer: Strafer;
 
@@ -48,6 +51,10 @@ export class BotBrain {
     destination: TargetPosition | null = null,
   ): void {
     if (bot.parachuting || bot.health.dead) return;
+    this.watchDamage(bot, dt);
+
+    // On its way to the zone a bot only stops for an enemy that is close or shooting at it.
+    if (target && destination && !this.worthFighting(bot, target)) target = null;
 
     if (!target) {
       const left = destination && Math.hypot(destination.x - bot.x, destination.z - bot.z);
@@ -77,6 +84,26 @@ export class BotBrain {
       const side = this.strafer.update(dt);
       this.move(bot, bot.yaw + (side * Math.PI) / 2, config.bots.strafeSpeed, world, dt);
     }
+  }
+
+  /** Remember for a few seconds that the bot was hurt. */
+  private watchDamage(bot: Bot, dt: number): void {
+    const total = bot.health.health + bot.health.armor;
+    if (this.lastHealth !== null && total < this.lastHealth) {
+      this.underFireLeft = config.bots.underFireSeconds;
+    }
+    this.lastHealth = total;
+    this.underFireLeft = Math.max(0, this.underFireLeft - dt);
+  }
+
+  private worthFighting(bot: Bot, target: TargetPosition): boolean {
+    const close = Math.hypot(target.x - bot.x, target.z - bot.z) <= config.bots.zoneFightRange;
+    return close || this.underFireLeft > 0;
+  }
+
+  /** True for a few seconds after the bot took damage. */
+  get underFire(): boolean {
+    return this.underFireLeft > 0;
   }
 
   private wander(bot: Bot, world: BoxSource | readonly Box[], dt: number): void {
