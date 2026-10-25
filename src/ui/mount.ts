@@ -18,7 +18,14 @@ export interface UiContext {
   weapon?: Weapon;
   inventory?: Inventory;
   /** The flood zone, for widgets that react to standing outside the dry zone. */
-  zone?: { isDry: (x: number, z: number) => boolean };
+  zone?: {
+    isDry: (x: number, z: number) => boolean;
+    /** The phase, 1 to 5. */
+    phase: number;
+    stage: 'wait' | 'shrink' | 'done';
+    /** Seconds left in the current wait or shrink. */
+    stageLeft: number;
+  };
   /** Ask the browser to capture the mouse again. Needs a click or key press to work. */
   requestPointerLock: () => void;
 }

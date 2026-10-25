@@ -1,0 +1,27 @@
+.hud-zone-clock {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 150px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  background: rgba(10, 40, 70, 0.7);
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.hud-zone-clock-time {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.hud-zone-clock-label {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.hud-zone-clock.hud-zone-clock-shrinking .hud-zone-clock-time {
+  color: #ff8a65;
+}
