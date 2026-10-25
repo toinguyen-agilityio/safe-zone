@@ -1,5 +1,8 @@
 import { config } from '../config';
 import { updatePlayer, type Player, type PlayerInput } from '../entities/player';
+import { applyMouseLook } from './look';
+import { resolveLanding } from './landing';
+import { stepParachute } from './parachute';
 import { collidePlayer, createCollisionWorld } from './player-collision';
 import { createGroundHeight } from '../physics/ground';
 import type { BoxSource } from '../physics/collision';
@@ -33,6 +36,10 @@ export function updatePlayerMotion(
   world: MotionWorld,
   dt: number,
 ): void {
+  if (player.parachuting) {
+    updateParachuting(player, input, world, dt);
+    return;
+  }
   const { eyeHeight, climbSpeed } = config.player;
   const feetBefore = player.y - eyeHeight;
   player.swimming = isSwimming(player.x, player.z, feetBefore);
@@ -62,4 +69,51 @@ export function updatePlayerMotion(
   const feetAfter = player.y - eyeHeight;
   const groundAfter = world.groundHeight(player.x, player.z, feetAfter);
   player.airborne = !isGrounded({ y: feetAfter, vy: player.vy }, groundAfter + AIRBORNE_TOLERANCE);
+}
+
+const NO_KEYS = { forward: false, back: false, left: false, right: false };
+
+/**
+ * The drop at the start of a match: look around, drift with WASD, fall faster on Space. Keys and
+ * mouse count only while the mouse is captured, but the fall goes on either way. On touchdown the
+ * landing spot is moved out of any house, the parachute is dropped and walking control starts.
+ */
+function updateParachuting(
+  player: Player,
+  input: PlayerInput,
+  world: MotionWorld,
+  dt: number,
+): void {
+  const { eyeHeight } = config.player;
+  if (input.locked) {
+    const look = applyMouseLook(player, input.mouseDelta.x, input.mouseDelta.y);
+    player.yaw = look.yaw;
+    player.pitch = look.pitch;
+  }
+
+  const feet = player.y - eyeHeight;
+  const ground = world.groundHeight(player.x, player.z, feet);
+  const next = stepParachute(
+    { x: player.x, z: player.z, feetY: feet, landed: false },
+    input.locked ? input.keys : NO_KEYS,
+    player.yaw,
+    Boolean(input.locked && input.jump),
+    ground,
+    dt,
+  );
+  player.x = next.x;
+  player.z = next.z;
+  player.y = next.feetY + eyeHeight;
+  player.swimming = false;
+  player.sprinting = false;
+  player.airborne = true;
+  player.vy = 0;
+
+  if (!next.landed) return;
+  const spot = resolveLanding(next, world.collision);
+  player.x = spot.x;
+  player.z = spot.z;
+  player.y = world.groundHeight(spot.x, spot.z, next.feetY) + eyeHeight;
+  player.parachuting = false;
+  player.airborne = false;
 }

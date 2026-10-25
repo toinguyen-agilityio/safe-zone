@@ -1,4 +1,5 @@
 import { config } from '../config';
+import { createRng } from '../core/rng';
 import type { MouseDelta } from '../core/input';
 import { applyMouseLook } from '../systems/look';
 import type { MoveKeys } from '../systems/movement';
@@ -19,6 +20,8 @@ export interface Player {
   sprinting: boolean;
   /** The feet are off the ground, jumping or falling. */
   airborne: boolean;
+  /** Still under the parachute at the start of the match; walking control starts on touchdown. */
+  parachuting: boolean;
 }
 
 export interface PlayerInput {
@@ -41,6 +44,7 @@ export function createPlayer(): Player {
     swimming: false,
     sprinting: false,
     airborne: false,
+    parachuting: false,
   };
 }
 
@@ -54,4 +58,20 @@ export function updatePlayer(player: Player, input: PlayerInput, dt: number): vo
   const velocity = moveVelocity(input.keys, player.yaw, player.swimming);
   player.x += velocity.x * dt;
   player.z += velocity.z * dt;
+}
+
+/** Where a match starts: a seeded spot over the map, high up under the parachute. */
+export function createParachutingPlayer(seed: number): Player {
+  const rng = createRng(seed ^ 0x5eed);
+  const span = config.world.mapSize - 40;
+  const player = createPlayer();
+  player.x = (rng.float() - 0.5) * span;
+  player.z = (rng.float() - 0.5) * span;
+  player.y = config.player.parachuteStartHeight + config.player.eyeHeight;
+  // Face the middle of the map and look down at the city.
+  player.yaw = Math.atan2(player.x, player.z);
+  player.pitch = -0.6;
+  player.parachuting = true;
+  player.airborne = true;
+  return player;
 }
