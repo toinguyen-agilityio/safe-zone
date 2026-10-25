@@ -6,8 +6,11 @@ import type { Box } from '../physics/spatial-grid';
 import { collidePlayer } from '../systems/player-collision';
 import { Strafer } from './strafe';
 
-/** What a bot is doing: wandering with nobody in sight, running at a target, or fighting it. */
-export type BotMode = 'idle' | 'chase' | 'engage';
+/**
+ * What a bot is doing: wandering with nobody in sight, walking to a destination, running at a
+ * target, or fighting it.
+ */
+export type BotMode = 'idle' | 'chase' | 'engage' | 'travel';
 
 /** The part of a target the brain needs: where it stands. */
 export interface TargetPosition {
@@ -41,12 +44,21 @@ export class BotBrain {
     target: TargetPosition | null,
     world: BoxSource | readonly Box[],
     dt: number,
+    /** Where to walk when there is nobody to fight, for example into the next dry zone. */
+    destination: TargetPosition | null = null,
   ): void {
     if (bot.parachuting || bot.health.dead) return;
 
     if (!target) {
-      this.mode = 'idle';
-      this.wander(bot, world, dt);
+      const left = destination && Math.hypot(destination.x - bot.x, destination.z - bot.z);
+      if (destination && left! > config.bots.arriveDistance) {
+        this.mode = 'travel';
+        bot.yaw = yawToward(bot.x, bot.z, destination.x, destination.z);
+        this.move(bot, bot.yaw, config.bots.walkSpeed, world, dt);
+      } else {
+        this.mode = 'idle';
+        this.wander(bot, world, dt);
+      }
       return;
     }
 

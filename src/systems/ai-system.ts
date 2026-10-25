@@ -2,6 +2,7 @@ import { createRng } from '../core/rng';
 import type { EventBus } from '../core/events';
 import { BotBrain } from '../ai/bot-brain';
 import { BotFire } from '../ai/bot-fire';
+import { ZoneMover, type ZoneInfo } from '../ai/zone-move';
 import { pickTarget, type Combatant } from '../ai/targeting';
 import type { Bot } from '../entities/bot';
 import type { BoxQuery, RayBox } from '../physics/raycast';
@@ -14,6 +15,7 @@ const RETARGET_SECONDS = 0.25;
 interface BotMind {
   brain: BotBrain;
   fire: BotFire;
+  mover: ZoneMover;
   target: Combatant | null;
   retargetLeft: number;
 }
@@ -35,6 +37,8 @@ export class AiSystem {
     private readonly seed: number,
     /** Where the bots' hits go, for the damage system. */
     private readonly events: EventBus,
+    /** What the zone is doing, so bots can walk into the next dry zone; none means they do not. */
+    private readonly zone: () => ZoneInfo | null = () => null,
   ) {}
 
   /** The brain's current mode for a bot, for tests and debugging. */
@@ -61,7 +65,8 @@ export class AiSystem {
 
       // Follow the target where it is now, not where it was when it was picked.
       const current = mind.target && this.positionOf(mind.target, alive, player);
-      mind.brain.update(bot, current ?? null, this.world.collision, dt);
+      const goal = mind.mover.update(bot, this.zone(), this.world.collision);
+      mind.brain.update(bot, current ?? null, this.world.collision, dt, goal);
       mind.fire.update(dt, bot, current ?? null, mind.brain.mode === 'engage');
       bot.feetY = this.world.groundHeight(bot.x, bot.z, bot.feetY);
     }
@@ -74,6 +79,7 @@ export class AiSystem {
       mind = {
         brain: new BotBrain(createRng(seed)),
         fire: new BotFire(createRng(seed ^ 0xf17e), this.events),
+        mover: new ZoneMover(createRng(seed ^ 0x20ee)),
         target: null,
         retargetLeft: 0,
       };
