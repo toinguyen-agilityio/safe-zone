@@ -90,6 +90,7 @@ describe('config', () => {
     expect(config.bots.wanderTurnSeconds).toEqual({ min: 2, max: 5 });
     expect(config.ui.killFeedMax).toBe(5);
     expect(config.ui.bannerSeconds).toBe(4);
+    expect(config.ui.toastSeconds).toBe(2);
   });
 
   it('defines zone values', () => {
