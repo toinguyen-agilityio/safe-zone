@@ -9,6 +9,8 @@ export const player = {
   eyeHeight: 1.7,
   /** Where the player stands before the parachute drop exists: a street crossing. */
   spawn: { x: 0, z: 0 },
+  /** Swimming speed in units per second; sprinting is not possible in the water. */
+  swimSpeed: 2.2,
   /** Holding Shift multiplies the walking speed by this much. */
   sprintMultiplier: 1.7,
   /** Downward pull in units per second squared. */

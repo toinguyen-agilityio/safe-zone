@@ -14,6 +14,7 @@ import { readMoveKeys } from './systems/movement';
 import { createGroundHeight } from './physics/ground';
 import { collidePlayer, createCollisionWorld } from './systems/player-collision';
 import { updatePlayerHeight } from './systems/player-height';
+import { isSwimming } from './systems/swim';
 import { getLayout } from './world/layout';
 
 declare module './core/events' {
@@ -54,6 +55,11 @@ export class Game {
     const groundHeight = createGroundHeight(layout);
     this.addUpdate((dt) => {
       const previous = { x: this.player.x, z: this.player.z };
+      this.player.swimming = isSwimming(
+        this.player.x,
+        this.player.z,
+        this.player.y - config.player.eyeHeight,
+      );
       updatePlayer(
         this.player,
         {

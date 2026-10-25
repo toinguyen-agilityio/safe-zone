@@ -20,6 +20,7 @@ describe('config', () => {
       radius: 0.4,
       eyeHeight: 1.7,
       spawn: { x: 0, z: 0 },
+      swimSpeed: 2.2,
       sprintMultiplier: 1.7,
       gravity: 24,
       jumpSpeed: 7.5,
