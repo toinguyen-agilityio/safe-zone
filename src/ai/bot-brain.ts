@@ -4,7 +4,9 @@ import type { Bot } from '../entities/bot';
 import type { BoxSource } from '../physics/collision';
 import type { Box } from '../physics/spatial-grid';
 import { collidePlayer } from '../systems/player-collision';
+import { yawToward } from './heading';
 import { Strafer } from './strafe';
+import { Unsticker } from './unstick';
 
 /**
  * What a bot is doing: wandering with nobody in sight, walking to a destination, running at a
@@ -18,10 +20,7 @@ export interface TargetPosition {
   z: number;
 }
 
-/** Yaw looking from (fromX, fromZ) toward (toX, toZ); yaw 0 looks toward -z like the player's. */
-export function yawToward(fromX: number, fromZ: number, toX: number, toZ: number): number {
-  return Math.atan2(-(toX - fromX), -(toZ - fromZ));
-}
+export { yawToward };
 
 /**
  * One bot's decisions. With a visible target it runs at it and stops at the engage range, then
@@ -37,9 +36,11 @@ export class BotBrain {
   private underFireLeft = 0;
 
   private readonly strafer: Strafer;
+  private readonly unsticker: Unsticker;
 
   constructor(private readonly rng: Rng) {
     this.strafer = new Strafer(rng);
+    this.unsticker = new Unsticker(rng.float() < 0.5 ? -1 : 1);
   }
 
   update(
@@ -60,10 +61,10 @@ export class BotBrain {
       const left = destination && Math.hypot(destination.x - bot.x, destination.z - bot.z);
       if (destination && left! > config.bots.arriveDistance) {
         this.mode = 'travel';
-        bot.yaw = yawToward(bot.x, bot.z, destination.x, destination.z);
-        this.move(bot, bot.yaw, config.bots.walkSpeed, world, dt);
+        this.walkTo(bot, destination, world, dt);
       } else {
         this.mode = 'idle';
+        this.unsticker.update(dt, bot, null);
         this.wander(bot, world, dt);
       }
       return;
@@ -78,12 +79,41 @@ export class BotBrain {
         : 'chase';
     bot.yaw = yawToward(bot.x, bot.z, target.x, target.z);
     if (this.mode === 'chase') {
-      this.move(bot, bot.yaw, config.bots.walkSpeed, world, dt);
+      this.walkTo(bot, target, world, dt);
     } else {
+      this.unsticker.update(dt, bot, null);
       // Fighting: sidestep across the line to the target, one way and then the other.
       const side = this.strafer.update(dt);
       this.move(bot, bot.yaw + (side * Math.PI) / 2, config.bots.strafeSpeed, world, dt);
     }
+  }
+
+  /** Walk toward a point at walking speed, going around whatever blocks the way. */
+  private walkTo(
+    bot: Bot,
+    goal: TargetPosition,
+    world: BoxSource | readonly Box[],
+    dt: number,
+  ): void {
+    const toGoal = yawToward(bot.x, bot.z, goal.x, goal.z);
+    const around = this.unsticker.update(dt, bot, goal, (yaw) => this.canStep(bot, yaw, world));
+    this.move(bot, around ?? toGoal, config.bots.walkSpeed, world, dt);
+    // While steering round an obstacle the bot still looks at where it is going.
+    bot.yaw = toGoal;
+  }
+
+  /**
+   * Could the bot take a step this way? Sliding along a wall does not count: the step has to carry
+   * it forward in the direction it asked for.
+   */
+  private canStep(bot: Bot, yaw: number, world: BoxSource | readonly Box[]): boolean {
+    const step = config.bots.unstick.probeStep;
+    const dirX = -Math.sin(yaw);
+    const dirZ = -Math.cos(yaw);
+    const moved = { x: bot.x + dirX * step, z: bot.z + dirZ * step };
+    collidePlayer(moved, { x: bot.x, z: bot.z }, world);
+    const forward = (moved.x - bot.x) * dirX + (moved.z - bot.z) * dirZ;
+    return forward >= step * 0.9;
   }
 
   /** Remember for a few seconds that the bot was hurt. */

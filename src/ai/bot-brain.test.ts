@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { config } from '../config';
 import { createRng } from '../core/rng';
 import { createBot, type Bot } from '../entities/bot';
-import type { Box } from '../physics/spatial-grid';
+import { distanceToBox, type Box } from '../physics/spatial-grid';
 import { BotBrain, yawToward } from './bot-brain';
 
 const landed = (x = 0, z = 0): Bot => {
@@ -76,12 +76,15 @@ describe('BotBrain with a target', () => {
     expect(brain.mode).toBe('chase');
   });
 
-  it('is stopped by a house on the way, like the player', () => {
+  it('never walks through a house on the way, like the player', () => {
     const bot = landed(0, 0);
     const brain = new BotBrain(createRng(1));
     const house: Box = { minX: 20, maxX: 30, minZ: -10, maxZ: 10 };
-    run(brain, bot, { x: 100, z: 0 }, 20, [house]);
-    expect(bot.x).toBeLessThanOrEqual(house.minX - config.player.radius + 1e-6);
+    for (let t = 0; t < 40; t += 0.1) {
+      brain.update(bot, { x: 100, z: 0 }, [house], 0.1);
+      const inside = distanceToBox(bot.x, bot.z, house) < config.player.radius - 1e-6;
+      expect(inside).toBe(false);
+    }
   });
 
   it('walks slower than the player', () => {
