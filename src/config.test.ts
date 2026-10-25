@@ -5,6 +5,7 @@ describe('config', () => {
   it('defines world values', () => {
     expect(config.world.mapSize).toBe(640);
     expect(typeof config.world.defaultSeed).toBe('number');
+    expect(config.world.maxDt).toBe(0.05);
   });
 
   it('defines player values', () => {
