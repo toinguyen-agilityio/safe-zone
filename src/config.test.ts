@@ -23,4 +23,28 @@ describe('config', () => {
       headMultiplier: 2,
     });
   });
+
+  it('defines bot and ui values', () => {
+    expect(config.bots.count).toBe(19);
+    expect(config.ui.killFeedMax).toBe(5);
+  });
+
+  it('defines zone values', () => {
+    expect(config.zone.radii).toEqual([230, 130, 68, 30, 6]);
+    expect(config.zone.drainStart).toBe(1);
+    expect(config.zone.drainEnd).toBe(12);
+    expect(config.zone.waitSeconds).toHaveLength(5);
+    expect(config.zone.shrinkSeconds).toHaveLength(5);
+  });
+
+  it('defines loot values', () => {
+    expect(config.loot.itemCount).toBe(150);
+    expect(config.loot.carryLimit).toEqual({ banhMi: 5, sugarcaneJuice: 3, ammo: 180 });
+    expect(config.loot.banhMi).toEqual({ healAmount: 30, healSeconds: 2 });
+    expect(config.loot.sugarcaneJuice).toEqual({
+      healAmount: 15,
+      healSeconds: 1.2,
+      buffSeconds: 8,
+    });
+  });
 });
