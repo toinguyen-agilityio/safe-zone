@@ -1,8 +1,9 @@
 import { Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
-import { applyPlayerToCamera } from './first-person-camera';
+import { applyAimToCamera, applyPlayerToCamera, HIP_FOV_DEGREES } from './first-person-camera';
+import { config } from '../config';
 import { createPlayer } from '../entities/player';
-import { attachViewmodel, buildRifle } from './viewmodel';
+import { attachViewmodel, buildRifle, placeViewmodel } from './viewmodel';
 
 describe('viewmodel', () => {
   it('is a child of the camera', () => {
@@ -42,5 +43,30 @@ describe('viewmodel', () => {
     const world = rifle.getWorldPosition(new Vector3());
     expect(world.distanceTo(camera.position)).toBeLessThan(1);
     expect(world.distanceTo(camera.position)).toBeGreaterThan(0.2);
+  });
+
+  it('moves to the centre of the view when aimed and back', () => {
+    const camera = new PerspectiveCamera();
+    const rifle = attachViewmodel(camera);
+    const hipX = rifle.position.x;
+    placeViewmodel(rifle, 1);
+    expect(rifle.position.x).toBe(0);
+    placeViewmodel(rifle, 0.5);
+    expect(rifle.position.x).toBeCloseTo(hipX / 2);
+    placeViewmodel(rifle, 0);
+    expect(rifle.position.x).toBe(hipX);
+  });
+});
+
+describe('applyAimToCamera', () => {
+  it('narrows the field of view and restores it', () => {
+    const camera = new PerspectiveCamera(HIP_FOV_DEGREES);
+    applyAimToCamera(camera, 1);
+    expect(camera.fov).toBe(config.combat.aim.fovDegrees);
+    applyAimToCamera(camera, 0.5);
+    expect(camera.fov).toBeGreaterThan(config.combat.aim.fovDegrees);
+    expect(camera.fov).toBeLessThan(HIP_FOV_DEGREES);
+    applyAimToCamera(camera, 0);
+    expect(camera.fov).toBe(HIP_FOV_DEGREES);
   });
 });

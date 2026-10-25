@@ -6,15 +6,20 @@ import { Pause, runUpdates } from './core/pause';
 import { Input } from './core/input';
 import { createParachutingPlayer } from './entities/player';
 import { Weapon } from './entities/weapon';
-import { applyPlayerToCamera } from './render/first-person-camera';
+import {
+  applyAimToCamera,
+  applyPlayerToCamera,
+  HIP_FOV_DEGREES,
+} from './render/first-person-camera';
 import { buildCanopy, updateCanopy } from './render/parachute';
 import { createFpsMeter } from './ui/fps-meter';
 import { mountUi } from './ui/mount';
 import { createRenderer } from './render/renderer';
-import { attachViewmodel } from './render/viewmodel';
+import { attachViewmodel, placeViewmodel } from './render/viewmodel';
 import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
 import { createRng } from './core/rng';
+import { Aim } from './systems/aim';
 import { FireControl } from './systems/fire-control';
 import { Recoil } from './systems/recoil';
 import { connectShotResolution, createShotObstacles, type Target } from './systems/shot';
@@ -33,13 +38,15 @@ export type UpdateFn = (dt: number) => void;
 /** Owns the renderer, scene, camera and loop. Features register update functions. */
 export class Game {
   readonly scene = new Scene();
-  readonly camera = new PerspectiveCamera(60, 1, 0.1, 1000);
+  readonly camera = new PerspectiveCamera(HIP_FOV_DEGREES, 1, 0.1, 1000);
   readonly renderer: WebGLRenderer;
   private readonly updates: UpdateFn[] = [];
   readonly events = new EventBus();
   readonly pause = new Pause();
   readonly input: Input;
   readonly weapon = new Weapon();
+  /** Right mouse button: raises the rifle to the eye and narrows the view. */
+  readonly aim = new Aim();
   /** Everyone a shot can hit besides the player. */
   readonly targets: Target[] = [];
   readonly player = createParachutingPlayer(config.world.defaultSeed);
@@ -57,7 +64,7 @@ export class Game {
     this.scene.add(buildWorldScene(getLayout()));
     // The camera joins the scene so the rifle parented to it gets drawn.
     this.scene.add(this.camera);
-    attachViewmodel(this.camera);
+    const rifle = attachViewmodel(this.camera);
     this.input = new Input(document, this.renderer.domElement);
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
     // There are no targets yet: bots add themselves to this list when they exist.
@@ -74,7 +81,7 @@ export class Game {
         return {
           moving: walking && !this.player.airborne,
           airborne: this.player.airborne,
-          aiming: this.input.isMouseDown(2),
+          aiming: this.aim.aiming,
         };
       },
     });
@@ -93,7 +100,15 @@ export class Game {
         motionWorld,
         dt,
       );
+      this.aim.update(dt, {
+        wantsAim: this.input.pointerLocked && this.input.isMouseDown(2),
+        swimming: this.player.swimming,
+        parachuting: this.player.parachuting,
+        sprinting: this.player.sprinting,
+      });
       fireControl.update(dt, this.input.pointerLocked);
+      placeViewmodel(rifle, this.aim.amount);
+      applyAimToCamera(this.camera, this.aim.amount);
       updateCanopy(canopy, this.player);
       applyPlayerToCamera(this.camera, this.player);
     });
