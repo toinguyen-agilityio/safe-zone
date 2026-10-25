@@ -11,6 +11,7 @@ import { buildCanopy, updateCanopy } from './render/parachute';
 import { createFpsMeter } from './ui/fps-meter';
 import { mountUi } from './ui/mount';
 import { createRenderer } from './render/renderer';
+import { attachViewmodel } from './render/viewmodel';
 import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
 import { createRng } from './core/rng';
@@ -54,6 +55,9 @@ export class Game {
     window.addEventListener('resize', () => this.resize());
     document.addEventListener('visibilitychange', () => this.loop.resetClock());
     this.scene.add(buildWorldScene(getLayout()));
+    // The camera joins the scene so the rifle parented to it gets drawn.
+    this.scene.add(this.camera);
+    attachViewmodel(this.camera);
     this.input = new Input(document, this.renderer.domElement);
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
     // There are no targets yet: bots add themselves to this list when they exist.
