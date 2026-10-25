@@ -9,6 +9,8 @@ export interface UiContext {
   events: EventBus;
   player: Player;
   pause: Pause;
+  /** The flood zone, for widgets that react to standing outside the dry zone. */
+  zone?: { isDry: (x: number, z: number) => boolean };
   /** Ask the browser to capture the mouse again. Needs a click or key press to work. */
   requestPointerLock: () => void;
 }
