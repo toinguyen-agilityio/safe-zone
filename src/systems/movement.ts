@@ -5,6 +5,8 @@ export interface MoveKeys {
   back: boolean;
   left: boolean;
   right: boolean;
+  /** Shift is held. Optional so callers that only walk can leave it out. */
+  sprint?: boolean;
 }
 
 export interface Velocity {
@@ -19,13 +21,15 @@ export function readMoveKeys(input: { isDown: (code: string) => boolean }): Move
     back: input.isDown('KeyS'),
     left: input.isDown('KeyA'),
     right: input.isDown('KeyD'),
+    sprint: input.isDown('ShiftLeft') || input.isDown('ShiftRight'),
   };
 }
 
 /**
  * Walking velocity on the ground plane. Yaw 0 looks toward -z and a positive yaw turns left,
  * as in three.js, so forward is (-sin yaw, -cos yaw) and right is (cos yaw, -sin yaw).
- * Diagonal movement is normalized so it is not faster than walking straight.
+ * Diagonal movement is normalized so it is not faster than walking straight. Holding Shift
+ * multiplies the speed by the sprint multiplier.
  */
 export function walkVelocity(
   keys: MoveKeys,
@@ -37,6 +41,7 @@ export function walkVelocity(
   if (ahead === 0 && side === 0) return { x: 0, z: 0 };
 
   const length = Math.hypot(ahead, side);
+  const pace = keys.sprint ? speed * config.player.sprintMultiplier : speed;
   const sin = Math.sin(yaw);
   const cos = Math.cos(yaw);
   const forwardX = -sin;
@@ -44,7 +49,7 @@ export function walkVelocity(
   const rightX = cos;
   const rightZ = -sin;
   return {
-    x: ((forwardX * ahead + rightX * side) / length) * speed,
-    z: ((forwardZ * ahead + rightZ * side) / length) * speed,
+    x: ((forwardX * ahead + rightX * side) / length) * pace,
+    z: ((forwardZ * ahead + rightZ * side) / length) * pace,
   };
 }

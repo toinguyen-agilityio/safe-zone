@@ -51,6 +51,7 @@ describe('readMoveKeys', () => {
       back: false,
       left: false,
       right: true,
+      sprint: false,
     });
   });
 });
