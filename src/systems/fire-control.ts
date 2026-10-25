@@ -1,6 +1,9 @@
 import type { EventBus } from '../core/events';
 import type { Player } from '../entities/player';
 import type { Weapon } from '../entities/weapon';
+import type { Rng } from '../core/rng';
+import { applySpread, type Recoil } from './recoil';
+import { currentSpread, type SpreadState } from './spread';
 
 export interface Vec3 {
   x: number;
@@ -46,11 +49,20 @@ export class FireControl {
   private armed = false;
   private wasReloadDown = false;
 
+  /**
+   * Without the options every shot goes exactly where the player looks. With them, each shot is
+   * offset at random inside the spread cone for what the player is doing, and kicks the view.
+   */
   constructor(
     private readonly weapon: Weapon,
     private readonly player: Player,
     private readonly input: FireInput,
     private readonly events: EventBus,
+    private readonly options: {
+      rng?: Rng;
+      spreadState?: () => SpreadState;
+      recoil?: Recoil;
+    } = {},
   ) {}
 
   /** `locked` is true while the mouse is captured. Returns the shots fired this frame. */
@@ -70,12 +82,18 @@ export class FireControl {
       this.player,
     );
 
+    const { rng, spreadState, recoil } = this.options;
     for (let i = 0; i < result.shots; i++) {
+      // The bullet leaves before the kick of this shot lifts the view.
+      let direction = lookDirection(this.player.yaw, this.player.pitch);
+      if (rng && spreadState) direction = applySpread(direction, currentSpread(spreadState()), rng);
       this.events.emit('shot', {
         origin: { x: this.player.x, y: this.player.y, z: this.player.z },
-        direction: lookDirection(this.player.yaw, this.player.pitch),
+        direction,
       });
+      recoil?.kick(this.player);
     }
+    recoil?.update(dt, this.player);
     return result.shots;
   }
 }
