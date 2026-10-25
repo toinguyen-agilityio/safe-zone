@@ -12,6 +12,8 @@ import {
   applyPlayerToCamera,
   HIP_FOV_DEGREES,
 } from './render/first-person-camera';
+import { MuzzleFlash } from './render/muzzle-flash';
+import { TracerPool } from './render/tracer';
 import { buildCanopy, updateCanopy } from './render/parachute';
 import { createFpsMeter } from './ui/fps-meter';
 import { mountUi } from './ui/mount';
@@ -72,6 +74,12 @@ export class Game {
     // The camera joins the scene so the rifle parented to it gets drawn.
     this.scene.add(this.camera);
     const rifle = attachViewmodel(this.camera);
+    const tracers = new TracerPool(this.scene);
+    const flash = new MuzzleFlash(rifle);
+    this.events.on('shot', (shot) => {
+      tracers.fire(shot.origin, shot.direction);
+      flash.flash();
+    });
     this.input = new Input(document, this.renderer.domElement);
     this.kills = new KillLog(this.events);
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
@@ -107,6 +115,8 @@ export class Game {
     this.scene.add(canopy);
     this.addUpdate((dt) => {
       this.elapsed += dt;
+      tracers.update(dt);
+      flash.update(dt);
       updatePlayerMotion(
         this.player,
         {
