@@ -3,6 +3,14 @@ export const player = {
   armorMax: 60,
   armorBlock: 0.45,
   parachuteStartHeight: 75,
+  parachute: {
+    /** Steady descent speed under the canopy, in units per second. */
+    fallSpeed: 6,
+    /** Descent speed while Space is held, in units per second. */
+    fastFallSpeed: 20,
+    /** How fast WASD drifts the player sideways while descending, in units per second. */
+    driftSpeed: 9,
+  },
   /** Radius of the circle the player occupies on the ground. */
   radius: 0.4,
   /** Height of the eyes above the ground. */

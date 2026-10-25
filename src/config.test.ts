@@ -17,6 +17,7 @@ describe('config', () => {
       armorMax: 60,
       armorBlock: 0.45,
       parachuteStartHeight: 75,
+      parachute: { fallSpeed: 6, fastFallSpeed: 20, driftSpeed: 9 },
       radius: 0.4,
       eyeHeight: 1.7,
       spawn: { x: 0, z: 0 },
