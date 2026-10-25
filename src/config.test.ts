@@ -46,6 +46,7 @@ describe('config', () => {
         recoverDegreesPerSecond: 8,
         recoverDelaySeconds: 0.12,
       },
+      aim: { fovDegrees: 35, transitionSeconds: 0.15 },
       maxShotDistance: 400,
       fireIntervalSeconds: 0.1,
       startingReserve: 90,

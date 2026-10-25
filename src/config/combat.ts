@@ -21,6 +21,13 @@ export const combat = {
     /** Seconds after the last shot before the view starts to settle. */
     recoverDelaySeconds: 0.12,
   },
+  /** Holding the right mouse button raises the rifle to the eye and narrows the view. */
+  aim: {
+    /** Vertical field of view while fully aimed; the normal view is wider. */
+    fovDegrees: 35,
+    /** Seconds to go from hip to fully aimed, and back. */
+    transitionSeconds: 0.15,
+  },
   /** A shot reaches this far. */
   maxShotDistance: 400,
   /** Seconds between two shots while the trigger is held (10 rounds per second). */
