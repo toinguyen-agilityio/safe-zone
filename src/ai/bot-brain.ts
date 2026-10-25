@@ -148,6 +148,11 @@ export class BotBrain {
     return gave;
   }
 
+  /** The bot is working its way round an obstacle it got stuck on. */
+  get stuck(): boolean {
+    return this.unsticker.active;
+  }
+
   /** True for a few seconds after the bot took damage. */
   get underFire(): boolean {
     return this.underFireLeft > 0;

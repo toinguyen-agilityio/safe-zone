@@ -45,6 +45,11 @@ export class AiSystem {
     private readonly zone: () => ZoneInfo | null = () => null,
   ) {}
 
+  /** Is the bot stuck on an obstacle right now? */
+  isStuck(bot: Bot): boolean {
+    return this.minds.get(bot.id)?.brain.stuck ?? false;
+  }
+
   /** The brain's current mode for a bot, for tests and debugging. */
   modeOf(bot: Bot): string {
     return this.minds.get(bot.id)?.brain.mode ?? 'idle';
