@@ -63,6 +63,11 @@ describe('config', () => {
   it('defines bot and ui values', () => {
     expect(config.bots.count).toBe(19);
     expect(config.bots.dropMargin).toBe(20);
+    expect(config.bots.walkSpeed).toBe(4);
+    expect(config.bots.engageRange).toBe(25);
+    expect(config.bots.disengageRange).toBe(30);
+    expect(config.bots.wanderSpeed).toBe(1.5);
+    expect(config.bots.wanderTurnSeconds).toEqual({ min: 2, max: 5 });
     expect(config.ui.killFeedMax).toBe(5);
   });
 
