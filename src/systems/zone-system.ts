@@ -1,5 +1,6 @@
 import { config } from '../config';
 import type { EventBus } from '../core/events';
+import { announcement } from '../ui/messages-vi';
 import { Zone, type ZonePoint, type ZoneStage } from './zone';
 import { chooseZoneCenters } from './zone-center';
 
@@ -99,10 +100,12 @@ export class ZoneSystem {
       this.lastPhase = phase;
       this.lastStage = 'wait';
       this.events.emit('zone:phase', event());
+      this.events.emit('announce', announcement('newDryZone'));
     }
     if (stage === 'shrink' && this.lastStage !== 'shrink') {
       this.lastStage = 'shrink';
       this.events.emit('zone:shrink', event());
+      this.events.emit('announce', announcement('waterRising'));
     }
   }
 }
