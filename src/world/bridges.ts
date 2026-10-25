@@ -99,3 +99,11 @@ function specFor(bridge: Bridge, layout: Layout): BridgeSpec {
 export function getBridges(layout: Layout): BridgeSpec[] {
   return layout.bridges.map((bridge) => specFor(bridge, layout));
 }
+
+/** Height of the bridge surface (ramps and deck) at x: 0 at the ends, `deckHeight` over the river. */
+export function bridgeSurfaceHeight(spec: BridgeSpec, x: number): number {
+  if (x <= spec.rampStartX || x >= spec.rampEndX) return 0;
+  if (x < spec.deckStartX) return ((x - spec.rampStartX) / spec.rampLength) * spec.deckHeight;
+  if (x > spec.deckEndX) return ((spec.rampEndX - x) / spec.rampLength) * spec.deckHeight;
+  return spec.deckHeight;
+}

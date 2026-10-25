@@ -9,7 +9,7 @@ import {
   Vector3,
 } from 'three';
 import { config } from '../config';
-import type { BridgeSpec } from '../world/bridges';
+import { bridgeSurfaceHeight, type BridgeSpec } from '../world/bridges';
 
 const { dragon } = config.world;
 
@@ -25,14 +25,6 @@ const WAVE_SIDE = 3;
 const WAVES = 3;
 const SAMPLES = 60;
 
-/** Height of the bridge surface (ramps and deck) at x. */
-function surfaceHeight(spec: BridgeSpec, x: number): number {
-  if (x <= spec.rampStartX || x >= spec.rampEndX) return 0;
-  if (x < spec.deckStartX) return ((x - spec.rampStartX) / spec.rampLength) * spec.deckHeight;
-  if (x > spec.deckEndX) return ((spec.rampEndX - x) / spec.rampLength) * spec.deckHeight;
-  return spec.deckHeight;
-}
-
 /**
  * The spine of the dragon from the tail end (t = 0) to the head end (t = 1), so the head and
  * tail tasks can place their parts at the two ends.
@@ -45,7 +37,7 @@ export function dragonSpine(spec: BridgeSpec): CatmullRomCurve3 {
     const wave = Math.sin(t * Math.PI * 2 * WAVES);
     // Keep the body inside the railings: never wider than half the deck.
     const side = Math.min(WAVE_SIDE, spec.deckWidth / 2 - BODY_RADIUS - 1) * wave;
-    const y = surfaceHeight(spec, x) + CLEARANCE + WAVE_HEIGHT * wave;
+    const y = bridgeSurfaceHeight(spec, x) + CLEARANCE + WAVE_HEIGHT * wave;
     points.push(new Vector3(x, y, spec.z + side));
   }
   return new CatmullRomCurve3(points);

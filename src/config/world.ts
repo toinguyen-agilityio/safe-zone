@@ -48,6 +48,10 @@ export const world = {
   },
   /** Ground and river continue this far past the map edge so no gap shows. */
   edgePadding: 100,
+  /** Height of the ground on land, where streets and sidewalks are. */
+  roadLevel: 0,
+  /** Walking onto a bridge surface up to this far above the feet counts as stepping onto it. */
+  stepUpHeight: 0.6,
   bridgeDeckWidth: 16,
   bridgeZs: { han: -120, dragon: 40, tranThiLy: 200 },
   bridgeRampLength: 30,
