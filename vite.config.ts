@@ -5,5 +5,7 @@ export default defineConfig({
   test: {
     include: ['src/**/*.test.ts'],
     environment: 'node',
+    // Only the overlay stylesheet is processed, so a test can check its rules.
+    css: { include: [/ui-root\.css/] },
   },
 });
