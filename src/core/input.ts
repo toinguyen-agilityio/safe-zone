@@ -21,6 +21,8 @@ export class Input {
   private readonly clickHandlers = new Set<() => void>();
   private deltaX = 0;
   private deltaY = 0;
+  /** Browsers can report a large jump in the first mouse event after the lock starts. */
+  private skipNextMove = false;
 
   constructor(
     private readonly doc: InputDocument,
@@ -70,13 +72,21 @@ export class Input {
 
   private onMouseMove(event: MouseEvent): void {
     if (!this.pointerLocked) return;
+    if (this.skipNextMove) {
+      this.skipNextMove = false;
+      return;
+    }
     this.deltaX += event.movementX;
     this.deltaY += event.movementY;
   }
 
   /** Releasing the mouse (Esc) must not leave keys stuck down. */
   private onPointerLockChange(): void {
-    if (this.pointerLocked) return;
+    if (this.pointerLocked) {
+      this.skipNextMove = true;
+      return;
+    }
+    this.skipNextMove = false;
     this.keys.clear();
     this.buttons.clear();
     this.deltaX = 0;
