@@ -229,6 +229,7 @@ export class Game {
       events: this.events,
       player: this.player,
       pause: this.pause,
+      zone: this.zone,
       requestPointerLock: () => this.renderer.domElement.requestPointerLock(),
     });
     const fps = createFpsMeter(window.location.search, container);
