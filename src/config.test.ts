@@ -96,6 +96,7 @@ describe('config', () => {
     expect(config.zone.radii).toEqual([230, 130, 68, 30, 6]);
     expect(config.zone.drainStart).toBe(1);
     expect(config.zone.drainEnd).toBe(12);
+    expect(config.zone.drainPerSecond).toEqual([1, 3, 6, 9, 12]);
     expect(config.zone.waitSeconds).toHaveLength(5);
     expect(config.zone.shrinkSeconds).toHaveLength(5);
   });
