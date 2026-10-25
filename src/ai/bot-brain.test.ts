@@ -44,18 +44,25 @@ describe('BotBrain with a target', () => {
 
     run(brain, bot, target, 30);
     expect(brain.mode).toBe('engage');
-    expect(distance(bot, target)).toBeLessThanOrEqual(config.bots.engageRange);
+    // Strafing drifts it a little wider than the engage range, never past the disengage range.
+    expect(distance(bot, target)).toBeLessThanOrEqual(config.bots.disengageRange);
     expect(distance(bot, target)).toBeGreaterThan(config.bots.engageRange - 1);
   });
 
-  it('holds still and faces the target while engaged', () => {
+  it('faces the target and sidesteps across the line to it while engaged', () => {
     const bot = landed(0, 0);
     const brain = new BotBrain(createRng(1));
     const target = { x: 20, z: 0 };
-    run(brain, bot, target, 3);
+    let farthest = 0;
+    for (let t = 0; t < 3; t += 0.1) {
+      brain.update(bot, target, [], 0.1);
+      farthest = Math.max(farthest, Math.abs(bot.z));
+    }
     expect(brain.mode).toBe('engage');
-    expect({ x: bot.x, z: bot.z }).toEqual({ x: 0, z: 0 });
-    expect(bot.yaw).toBeCloseTo(yawToward(0, 0, 20, 0));
+    // Sideways is along z here; the bot does not close in or back off while it strafes.
+    expect(farthest).toBeGreaterThan(1);
+    expect(bot.x).toBeCloseTo(0, 0);
+    expect(bot.yaw).toBeCloseTo(yawToward(bot.x, bot.z, 20, 0), 0);
   });
 
   it('chases again only after the target gets past the disengage range', () => {
