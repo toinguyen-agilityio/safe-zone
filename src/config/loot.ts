@@ -13,5 +13,11 @@ export const loot = {
   /** Armor points a raincoat gives, up to the most that can be worn. */
   raincoatArmor: 60,
   banhMi: { healAmount: 30, healSeconds: 2 },
-  sugarcaneJuice: { healAmount: 15, healSeconds: 1.2, buffSeconds: 8 },
+  sugarcaneJuice: {
+    healAmount: 15,
+    healSeconds: 1.2,
+    buffSeconds: 8,
+    /** Speed multiplier while the buff lasts. */
+    buffSpeedMultiplier: 1.25,
+  },
 } as const;

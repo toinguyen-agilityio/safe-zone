@@ -116,6 +116,7 @@ describe('config', () => {
       healAmount: 15,
       healSeconds: 1.2,
       buffSeconds: 8,
+      buffSpeedMultiplier: 1.25,
     });
   });
 });

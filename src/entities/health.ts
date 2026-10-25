@@ -27,6 +27,14 @@ export class Health {
     this.armor = Math.min(config.player.armorMax, this.armor + Math.max(0, points));
   }
 
+  /** Heal up to the full health. Returns how much was actually added; the dead cannot be healed. */
+  heal(points: number): number {
+    if (this.dead || points <= 0) return 0;
+    const added = Math.min(points, config.player.health - this.health);
+    this.health += added;
+    return added;
+  }
+
   damage(amount: number, kind: DamageKind): DamageResult {
     if (this.dead || amount <= 0) return { health: 0, armor: 0, killed: false };
 
