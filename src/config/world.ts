@@ -2,6 +2,8 @@ export const world = {
   mapSize: 640,
   defaultSeed: 20261023,
   maxDt: 0.05,
+  /** Side of a cell in the grid that finds nearby boxes. */
+  gridCellSize: 16,
   streetWidth: 14,
   /** Centers of the north-south streets (x) and east-west streets (z). */
   streetXs: [-240, -160, -80, 0, 80, 140],
