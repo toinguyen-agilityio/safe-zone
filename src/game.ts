@@ -1,11 +1,13 @@
 import { PerspectiveCamera, Scene, type WebGLRenderer } from 'three';
 import { config } from './config';
+import { EventBus } from './core/events';
 import { GameLoop } from './core/loop';
 import { Pause, runUpdates } from './core/pause';
 import { Input } from './core/input';
 import { createPlayer, updatePlayer } from './entities/player';
 import { applyPlayerToCamera } from './render/first-person-camera';
 import { createFpsMeter } from './ui/fps-meter';
+import { mountUi } from './ui/mount';
 import { createRenderer } from './render/renderer';
 import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
@@ -19,6 +21,7 @@ export class Game {
   readonly camera = new PerspectiveCamera(60, 1, 0.1, 1000);
   readonly renderer: WebGLRenderer;
   private readonly updates: UpdateFn[] = [];
+  readonly events = new EventBus();
   readonly pause = new Pause();
   readonly input: Input;
   readonly player = createPlayer();
@@ -49,6 +52,7 @@ export class Game {
       applyPlayerToCamera(this.camera, this.player);
     });
     applyPlayerToCamera(this.camera, this.player);
+    mountUi(container, { events: this.events, player: this.player, pause: this.pause });
     const fps = createFpsMeter(window.location.search, container);
     if (fps) this.addUpdate((dt) => fps.update(dt));
     this.resize();

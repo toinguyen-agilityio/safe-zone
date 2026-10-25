@@ -1,0 +1,15 @@
+/* The overlay sits above the canvas and lets every mouse event through to the game. */
+#ui-root {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+  color: #fff;
+  user-select: none;
+}
+
+/* A widget that needs the mouse (a button, a menu) opts in with this class. */
+#ui-root .ui-interactive {
+  pointer-events: auto;
+}
