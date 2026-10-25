@@ -1,5 +1,7 @@
 import { createRng } from '../core/rng';
+import type { EventBus } from '../core/events';
 import { BotBrain } from '../ai/bot-brain';
+import { BotFire } from '../ai/bot-fire';
 import { pickTarget, type Combatant } from '../ai/targeting';
 import type { Bot } from '../entities/bot';
 import type { BoxQuery, RayBox } from '../physics/raycast';
@@ -11,13 +13,15 @@ const RETARGET_SECONDS = 0.25;
 
 interface BotMind {
   brain: BotBrain;
+  fire: BotFire;
   target: Combatant | null;
   retargetLeft: number;
 }
 
 /**
  * Runs every living bot's brain each frame: it picks the nearest enemy in sight (the player or
- * another bot), moves toward it with the brain, and keeps its feet on the ground.
+ * another bot), moves toward it with the brain, shoots at it once engaged, and keeps its feet
+ * on the ground.
  */
 export class AiSystem {
   private readonly minds = new Map<string, BotMind>();
@@ -29,6 +33,8 @@ export class AiSystem {
     /** The player as an enemy, or null when there is none. */
     private readonly player: () => Combatant | null,
     private readonly seed: number,
+    /** Where the bots' hits go, for the damage system. */
+    private readonly events: EventBus,
   ) {}
 
   /** The brain's current mode for a bot, for tests and debugging. */
@@ -56,6 +62,7 @@ export class AiSystem {
       // Follow the target where it is now, not where it was when it was picked.
       const current = mind.target && this.positionOf(mind.target, alive, player);
       mind.brain.update(bot, current ?? null, this.world.collision, dt);
+      mind.fire.update(dt, bot, current ?? null, mind.brain.mode === 'engage');
       bot.feetY = this.world.groundHeight(bot.x, bot.z, bot.feetY);
     }
   }
@@ -64,7 +71,12 @@ export class AiSystem {
     let mind = this.minds.get(bot.id);
     if (!mind) {
       const seed = this.seed ^ (this.minds.size * 0x9e3779b1);
-      mind = { brain: new BotBrain(createRng(seed)), target: null, retargetLeft: 0 };
+      mind = {
+        brain: new BotBrain(createRng(seed)),
+        fire: new BotFire(createRng(seed ^ 0xf17e), this.events),
+        target: null,
+        retargetLeft: 0,
+      };
       this.minds.set(bot.id, mind);
     }
     return mind;

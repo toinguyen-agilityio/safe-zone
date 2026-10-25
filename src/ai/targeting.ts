@@ -12,6 +12,10 @@ export interface Combatant {
   parachuting?: boolean;
   /** Out of health. */
   dead?: boolean;
+  /** Sprinting, which makes it harder to hit. */
+  running?: boolean;
+  /** Jumping or falling, which makes it harder still. */
+  airborne?: boolean;
 }
 
 /** Where a bot looks from, and where it aims at: the eyes of the watcher, the chest of the target. */
