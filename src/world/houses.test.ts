@@ -44,9 +44,13 @@ describe('generateHouses', () => {
   });
 
   it('keeps houses apart from each other and from alleys', () => {
-    city.houses.forEach((a, i) => {
-      for (const b of city.houses.slice(i + 1)) expect(overlaps(a, b)).toBe(false);
-      for (const alley of city.alleys) expect(overlaps(a, alley)).toBe(false);
+    // Sweep along x so each rectangle is only compared with its x-neighbours.
+    const rects = [...city.houses, ...city.alleys].sort((a, b) => bounds(a).x0 - bounds(b).x0);
+    rects.forEach((a, i) => {
+      for (const b of rects.slice(i + 1)) {
+        if (bounds(b).x0 >= bounds(a).x1 - 1e-9) break;
+        expect(overlaps(a, b)).toBe(false);
+      }
     });
   });
 
