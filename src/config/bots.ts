@@ -10,6 +10,19 @@ export const bots = {
   disengageRange: 30,
   /** Seconds a bot waits after first seeing an enemy before it may shoot. */
   reactionSeconds: 0.5,
+  /** Chance that a bot's shot hits: best up close, worst far away, less against a moving target. */
+  hitChance: {
+    /** At or inside `nearRange`. */
+    close: 0.8,
+    /** At or beyond `farRange`. */
+    far: 0.1,
+    nearRange: 10,
+    farRange: 100,
+    /** Multiplies the chance when the target is sprinting. */
+    runningMultiplier: 0.6,
+    /** Multiplies the chance when the target is jumping or falling. */
+    airborneMultiplier: 0.4,
+  },
   /** With nobody in sight a bot ambles around at this speed. */
   wanderSpeed: 1.5,
   /** Seconds between a wandering bot's changes of direction (min, max). */

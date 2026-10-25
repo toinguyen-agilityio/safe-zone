@@ -67,6 +67,14 @@ describe('config', () => {
     expect(config.bots.engageRange).toBe(25);
     expect(config.bots.disengageRange).toBe(30);
     expect(config.bots.reactionSeconds).toBe(0.5);
+    expect(config.bots.hitChance).toEqual({
+      close: 0.8,
+      far: 0.1,
+      nearRange: 10,
+      farRange: 100,
+      runningMultiplier: 0.6,
+      airborneMultiplier: 0.4,
+    });
     expect(config.bots.wanderSpeed).toBe(1.5);
     expect(config.bots.wanderTurnSeconds).toEqual({ min: 2, max: 5 });
     expect(config.ui.killFeedMax).toBe(5);
