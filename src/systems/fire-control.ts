@@ -16,6 +16,8 @@ export interface ShotEvent {
   origin: Vec3;
   /** Unit vector. */
   direction: Vec3;
+  /** Who fired it, so the shooter is never hit by their own bullet. */
+  shooter?: string;
 }
 
 declare module '../core/events' {
@@ -62,6 +64,7 @@ export class FireControl {
       rng?: Rng;
       spreadState?: () => SpreadState;
       recoil?: Recoil;
+      shooterId?: string;
     } = {},
   ) {}
 
@@ -82,7 +85,7 @@ export class FireControl {
       this.player,
     );
 
-    const { rng, spreadState, recoil } = this.options;
+    const { rng, spreadState, recoil, shooterId } = this.options;
     for (let i = 0; i < result.shots; i++) {
       // The bullet leaves before the kick of this shot lifts the view.
       let direction = lookDirection(this.player.yaw, this.player.pitch);
@@ -90,6 +93,7 @@ export class FireControl {
       this.events.emit('shot', {
         origin: { x: this.player.x, y: this.player.y, z: this.player.z },
         direction,
+        shooter: shooterId,
       });
       recoil?.kick(this.player);
     }

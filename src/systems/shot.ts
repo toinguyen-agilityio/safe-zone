@@ -6,7 +6,7 @@ import type { Layout, Rect } from '../world/types';
 import { hitCharacter, type Character, type HitRegion } from '../physics/hitboxes';
 import { raycast, type BoxQuery, type RayBox } from '../physics/raycast';
 import { SpatialGrid } from '../physics/spatial-grid';
-import type { ShotEvent } from './fire-control';
+import type { ShotEvent, Vec3 } from './fire-control';
 
 /** Something a shot can hit: a character with a name the damage can be attributed to. */
 export interface Target extends Character {
@@ -26,6 +26,10 @@ export interface HitEvent {
   damage: number;
   /** How far from the shooter the bullet struck. */
   distance: number;
+  /** Who fired, or null when unknown. */
+  shooter: string | null;
+  /** Where the shot started, for the damage indicator. */
+  origin: Vec3;
 }
 
 declare module '../core/events' {
@@ -55,6 +59,7 @@ export function resolveShot(
 
   let best: HitEvent | null = null;
   for (const target of world.targets()) {
+    if (target.id === shot.shooter) continue;
     const hit = hitCharacter(ray, target);
     if (!hit || (best && hit.distance >= best.distance)) continue;
     best = {
@@ -62,6 +67,8 @@ export function resolveShot(
       region: hit.region,
       damage: damageFor(hit.region),
       distance: hit.distance,
+      shooter: shot.shooter ?? null,
+      origin: shot.origin,
     };
   }
   // A target exactly at the wall is behind it: the wall wins a tie.

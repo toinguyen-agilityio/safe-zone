@@ -36,6 +36,7 @@ export function updatePlayerMotion(
   world: MotionWorld,
   dt: number,
 ): void {
+  if (player.dead) return;
   if (player.parachuting) {
     updateParachuting(player, input, world, dt);
     return;

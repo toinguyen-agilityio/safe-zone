@@ -12,6 +12,8 @@ export interface WeaponCarrier {
   swimming: boolean;
   parachuting: boolean;
   sprinting: boolean;
+  /** Optional so carriers that cannot die can leave it out. */
+  dead?: boolean;
 }
 
 export interface WeaponUpdate {
@@ -24,7 +26,7 @@ export interface WeaponUpdate {
 }
 
 export function canFire(carrier: WeaponCarrier): boolean {
-  return !carrier.swimming && !carrier.parachuting && !carrier.sprinting;
+  return !carrier.dead && !carrier.swimming && !carrier.parachuting && !carrier.sprinting;
 }
 
 /**
