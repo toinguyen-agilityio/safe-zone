@@ -34,6 +34,16 @@ export const world = {
     riverBand: 40,
     riverHeight: { min: 25, max: 45 },
   },
+  /** Window pattern on house walls, in world units; the same on small and large houses. */
+  windows: {
+    periodX: 3,
+    periodY: 3.5,
+    /** Fraction of a period that is window, centered in the cell. */
+    widthFraction: 0.5,
+    heightFraction: 0.5,
+    /** No windows below this height (ground floor shopfront). */
+    minHeight: 1.2,
+  },
   /** Ground and river continue this far past the map edge so no gap shows. */
   edgePadding: 100,
   bridgeDeckWidth: 16,
