@@ -22,6 +22,8 @@ export interface Player {
   airborne: boolean;
   /** Still under the parachute at the start of the match; walking control starts on touchdown. */
   parachuting: boolean;
+  /** Out of health: no moving and no shooting. */
+  dead: boolean;
 }
 
 export interface PlayerInput {
@@ -45,6 +47,7 @@ export function createPlayer(): Player {
     sprinting: false,
     airborne: false,
     parachuting: false,
+    dead: false,
   };
 }
 

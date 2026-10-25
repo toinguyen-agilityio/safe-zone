@@ -5,6 +5,7 @@ import { GameLoop } from './core/loop';
 import { Pause, runUpdates } from './core/pause';
 import { Input } from './core/input';
 import { createParachutingPlayer } from './entities/player';
+import { Health } from './entities/health';
 import { Weapon } from './entities/weapon';
 import {
   applyAimToCamera,
@@ -20,6 +21,8 @@ import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
 import { createRng } from './core/rng';
 import { Aim } from './systems/aim';
+import { connectDamage } from './systems/damage-system';
+import { KillLog } from './systems/kill-log';
 import { FireControl } from './systems/fire-control';
 import { Recoil } from './systems/recoil';
 import { connectShotResolution, createShotObstacles, type Target } from './systems/shot';
@@ -50,6 +53,10 @@ export class Game {
   /** Everyone a shot can hit besides the player. */
   readonly targets: Target[] = [];
   readonly player = createParachutingPlayer(config.world.defaultSeed);
+  readonly playerHealth = new Health();
+  readonly kills: KillLog;
+  /** Seconds of play so far, written on each kill. */
+  private elapsed = 0;
   private readonly loop: GameLoop;
 
   constructor(private readonly container: HTMLElement) {
@@ -66,13 +73,23 @@ export class Game {
     this.scene.add(this.camera);
     const rifle = attachViewmodel(this.camera);
     this.input = new Input(document, this.renderer.domElement);
+    this.kills = new KillLog(this.events);
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
     // There are no targets yet: bots add themselves to this list when they exist.
     connectShotResolution(this.events, {
       obstacles: createShotObstacles(getLayout()),
       targets: () => this.targets,
     });
+    connectDamage(this.events, {
+      entity: (id) =>
+        id === 'player'
+          ? { id, health: this.playerHealth, onKilled: () => (this.player.dead = true) }
+          : undefined,
+      kills: this.kills,
+      now: () => this.elapsed,
+    });
     const fireControl = new FireControl(this.weapon, this.player, this.input, this.events, {
+      shooterId: 'player',
       rng: createRng(config.world.defaultSeed ^ 0x5407),
       recoil: new Recoil(),
       spreadState: () => {
@@ -89,6 +106,7 @@ export class Game {
     const canopy = buildCanopy();
     this.scene.add(canopy);
     this.addUpdate((dt) => {
+      this.elapsed += dt;
       updatePlayerMotion(
         this.player,
         {
@@ -101,7 +119,7 @@ export class Game {
         dt,
       );
       this.aim.update(dt, {
-        wantsAim: this.input.pointerLocked && this.input.isMouseDown(2),
+        wantsAim: this.input.pointerLocked && !this.player.dead && this.input.isMouseDown(2),
         swimming: this.player.swimming,
         parachuting: this.player.parachuting,
         sprinting: this.player.sprinting,
