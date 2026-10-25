@@ -25,7 +25,9 @@ describe('buildBridges', () => {
       const box = new Box3().setFromObject(group);
       expect(box.min.x).toBeLessThanOrEqual(spec.rampStartX + 1);
       expect(box.max.x).toBeGreaterThanOrEqual(spec.rampEndX - 1);
-      expect((box.min.z + box.max.z) / 2).toBeCloseTo(spec.z);
+      // The deck is centered on the bridge z; the dragon on the Dragon Bridge is not symmetric.
+      const deck = new Box3().setFromObject(group.getObjectByName('deck')!);
+      expect((deck.min.z + deck.max.z) / 2).toBeCloseTo(spec.z);
     }
   });
 

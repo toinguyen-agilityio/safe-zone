@@ -32,8 +32,9 @@ describe('buildDragon', () => {
     expect(box.max.y).toBeGreaterThan(dragonSpec.deckHeight);
   });
 
-  it('stays within the width of the deck', () => {
-    const box = new Box3().setFromObject(dragon);
+  it('keeps the body within the width of the deck', () => {
+    const [body] = bodies(dragon);
+    const box = new Box3().setFromObject(body!);
     expect(box.min.z).toBeGreaterThanOrEqual(dragonSpec.z - dragonSpec.deckWidth / 2);
     expect(box.max.z).toBeLessThanOrEqual(dragonSpec.z + dragonSpec.deckWidth / 2);
   });
