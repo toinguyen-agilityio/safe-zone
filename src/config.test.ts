@@ -39,6 +39,7 @@ describe('config', () => {
       reloadSeconds: 1.8,
       headMultiplier: 2,
       bodyDamage: 25,
+      spread: { standingDegrees: 0.3, movingDegrees: 1.5, airborneDegrees: 4, aimMultiplier: 0.4 },
       maxShotDistance: 400,
       fireIntervalSeconds: 0.1,
       startingReserve: 90,
