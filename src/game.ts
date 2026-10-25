@@ -1,6 +1,7 @@
 import { PerspectiveCamera, Scene, type WebGLRenderer } from 'three';
 import { config } from './config';
 import { GameLoop } from './core/loop';
+import { Pause, runUpdates } from './core/pause';
 import { Input } from './core/input';
 import { createPlayer, updatePlayer } from './entities/player';
 import { applyPlayerToCamera } from './render/first-person-camera';
@@ -18,6 +19,7 @@ export class Game {
   readonly camera = new PerspectiveCamera(60, 1, 0.1, 1000);
   readonly renderer: WebGLRenderer;
   private readonly updates: UpdateFn[] = [];
+  readonly pause = new Pause();
   readonly input: Input;
   readonly player = createPlayer();
   private readonly loop: GameLoop;
@@ -26,9 +28,7 @@ export class Game {
     this.renderer = createRenderer(container);
     this.loop = new GameLoop({
       maxDt: config.world.maxDt,
-      update: (dt) => {
-        for (const update of this.updates) update(dt);
-      },
+      update: (dt) => runUpdates(this.updates, dt, this.pause),
       render: () => this.renderer.render(this.scene, this.camera),
     });
     window.addEventListener('resize', () => this.resize());
