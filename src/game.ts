@@ -29,6 +29,7 @@ import { Aim } from './systems/aim';
 import { AiSystem } from './systems/ai-system';
 import { PickupSystem } from './systems/pickup-system';
 import { connectDamage } from './systems/damage-system';
+import { ZoneSystem } from './systems/zone-system';
 import { KillLog } from './systems/kill-log';
 import { FireControl } from './systems/fire-control';
 import { Recoil } from './systems/recoil';
@@ -64,6 +65,8 @@ export class Game {
   readonly kills: KillLog;
   /** The 19 opponents; they drop in together with the player. */
   readonly bots: BotSystem;
+  /** The flood zone: five phases that shrink around new centers. */
+  readonly zone: ZoneSystem;
   /** Runs the bot brains: they hunt the nearest enemy in sight. */
   readonly ai: AiSystem;
   readonly inventory = new Inventory(this.playerHealth);
@@ -94,6 +97,7 @@ export class Game {
     });
     this.input = new Input(document, this.renderer.domElement);
     this.kills = new KillLog(this.events);
+    this.zone = new ZoneSystem(this.events, config.world.defaultSeed);
     this.pickups = new PickupSystem(generateLoot(getLayout()), this.events);
     // Browsers only allow sound after a click, so the audio context waits for the first one.
     installAudio(document);
@@ -149,6 +153,7 @@ export class Game {
     this.scene.add(canopy);
     this.addUpdate((dt) => {
       this.elapsed += dt;
+      this.zone.update(dt);
       this.bots.update(dt);
       this.ai.update(dt);
       tracers.update(dt);
