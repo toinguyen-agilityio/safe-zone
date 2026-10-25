@@ -1,8 +1,10 @@
 import { AmbientLight, DirectionalLight, Group } from 'three';
 import { config } from '../config';
+import { getBridges } from '../world/bridges';
 import { generateHouses } from '../world/houses';
 import type { Layout } from '../world/types';
 import { buildGround } from './ground';
+import { buildBridges } from './bridges';
 import { buildHouses } from './houses';
 import { buildRiver } from './river';
 
@@ -18,6 +20,7 @@ export function buildWorldScene(layout: Layout): Group {
 
   root.add(buildGround(layout));
   root.add(buildRiver(layout));
+  root.add(buildBridges(getBridges(layout)));
   root.add(buildHouses(generateHouses(layout, config.world.defaultSeed).houses));
   return root;
 }
