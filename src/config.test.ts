@@ -81,6 +81,8 @@ describe('config', () => {
     expect(config.bots.strafeTurnSeconds).toEqual({ min: 0.8, max: 2.2 });
     expect(config.bots.zoneWarningSeconds).toBe(20);
     expect(config.bots.arriveDistance).toBe(2);
+    expect(config.bots.zoneFightRange).toBe(40);
+    expect(config.bots.underFireSeconds).toBe(3);
     expect(config.bots.wanderSpeed).toBe(1.5);
     expect(config.bots.wanderTurnSeconds).toEqual({ min: 2, max: 5 });
     expect(config.ui.killFeedMax).toBe(5);
