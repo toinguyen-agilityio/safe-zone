@@ -8,6 +8,7 @@ import { createParachutingPlayer } from './entities/player';
 import { installAudio } from './audio/audio-context';
 import { connectSounds } from './audio/sound-system';
 import { Health } from './entities/health';
+import { Inventory } from './entities/inventory';
 import { Weapon } from './entities/weapon';
 import {
   applyAimToCamera,
@@ -25,6 +26,7 @@ import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
 import { createRng } from './core/rng';
 import { Aim } from './systems/aim';
+import { PickupSystem } from './systems/pickup-system';
 import { connectDamage } from './systems/damage-system';
 import { KillLog } from './systems/kill-log';
 import { FireControl } from './systems/fire-control';
@@ -32,6 +34,7 @@ import { Recoil } from './systems/recoil';
 import { connectShotResolution, createShotObstacles, type Target } from './systems/shot';
 import { createMotionWorld, updatePlayerMotion } from './systems/player-motion';
 import { getLayout } from './world/layout';
+import { generateLoot } from './world/loot-spawn';
 
 declare module './core/events' {
   interface EventMap {
@@ -59,6 +62,9 @@ export class Game {
   readonly player = createParachutingPlayer(config.world.defaultSeed);
   readonly playerHealth = new Health();
   readonly kills: KillLog;
+  readonly inventory = new Inventory(this.playerHealth);
+  /** The items still lying on the sidewalks. */
+  readonly pickups: PickupSystem;
   /** Seconds of play so far, written on each kill. */
   private elapsed = 0;
   private readonly loop: GameLoop;
@@ -84,6 +90,7 @@ export class Game {
     });
     this.input = new Input(document, this.renderer.domElement);
     this.kills = new KillLog(this.events);
+    this.pickups = new PickupSystem(generateLoot(getLayout()), this.events);
     // Browsers only allow sound after a click, so the audio context waits for the first one.
     installAudio(document);
     connectSounds(this.events);
@@ -139,6 +146,9 @@ export class Game {
         parachuting: this.player.parachuting,
         sprinting: this.player.sprinting,
       });
+      if (!this.player.dead && !this.player.parachuting) {
+        this.pickups.update(this.player, this.inventory);
+      }
       fireControl.update(dt, this.input.pointerLocked);
       placeViewmodel(rifle, this.aim.amount);
       applyAimToCamera(this.camera, this.aim.amount);
