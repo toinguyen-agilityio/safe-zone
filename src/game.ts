@@ -30,6 +30,7 @@ import { AiSystem } from './systems/ai-system';
 import { PickupSystem } from './systems/pickup-system';
 import { connectDamage } from './systems/damage-system';
 import { zoneInfo } from './ai/zone-move';
+import { ZoneDamageSystem } from './systems/zone-damage-system';
 import { ZoneSystem } from './systems/zone-system';
 import { KillLog } from './systems/kill-log';
 import { FireControl } from './systems/fire-control';
@@ -68,6 +69,8 @@ export class Game {
   readonly bots: BotSystem;
   /** The flood zone: five phases that shrink around new centers. */
   readonly zone: ZoneSystem;
+  /** The flood drains everyone outside the dry zone. */
+  readonly zoneDamage: ZoneDamageSystem;
   /** Runs the bot brains: they hunt the nearest enemy in sight. */
   readonly ai: AiSystem;
   readonly inventory = new Inventory(this.playerHealth);
@@ -99,6 +102,29 @@ export class Game {
     this.input = new Input(document, this.renderer.domElement);
     this.kills = new KillLog(this.events);
     this.zone = new ZoneSystem(this.events, config.world.defaultSeed);
+    this.zoneDamage = new ZoneDamageSystem({
+      zone: this.zone,
+      victims: () => [
+        {
+          id: 'player',
+          x: this.player.x,
+          z: this.player.z,
+          health: this.playerHealth,
+          skip: this.player.parachuting,
+          onKilled: () => (this.player.dead = true),
+        },
+        ...this.bots.alive.map((bot) => ({
+          id: bot.id,
+          x: bot.x,
+          z: bot.z,
+          health: bot.health,
+          skip: bot.parachuting,
+        })),
+      ],
+      kills: this.kills,
+      now: () => this.elapsed,
+      events: this.events,
+    });
     this.pickups = new PickupSystem(generateLoot(getLayout()), this.events);
     // Browsers only allow sound after a click, so the audio context waits for the first one.
     installAudio(document);
@@ -156,6 +182,7 @@ export class Game {
     this.addUpdate((dt) => {
       this.elapsed += dt;
       this.zone.update(dt);
+      this.zoneDamage.update(dt);
       this.bots.update(dt);
       this.ai.update(dt);
       tracers.update(dt);
