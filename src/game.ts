@@ -1,7 +1,10 @@
 import { PerspectiveCamera, Scene, type WebGLRenderer } from 'three';
 import { config } from './config';
 import { GameLoop } from './core/loop';
+import { placeOverheadCamera } from './render/overhead-camera';
 import { createRenderer } from './render/renderer';
+import { buildWorldScene } from './render/world-scene';
+import { getLayout } from './world/layout';
 
 export type UpdateFn = (dt: number) => void;
 
@@ -24,6 +27,8 @@ export class Game {
     });
     window.addEventListener('resize', () => this.resize());
     document.addEventListener('visibilitychange', () => this.loop.resetClock());
+    this.scene.add(buildWorldScene(getLayout()));
+    placeOverheadCamera(this.camera, config.world.mapSize);
     this.resize();
   }
 
