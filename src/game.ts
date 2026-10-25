@@ -16,6 +16,7 @@ import {
   HIP_FOV_DEGREES,
 } from './render/first-person-camera';
 import { createFloodWater } from './render/flood-water';
+import { createWaterWall } from './render/water-wall';
 import { MuzzleFlash } from './render/muzzle-flash';
 import { TracerPool } from './render/tracer';
 import { buildCanopy, updateCanopy } from './render/parachute';
@@ -96,6 +97,8 @@ export class Game {
     const rifle = attachViewmodel(this.camera);
     const water = createFloodWater();
     this.scene.add(water.mesh);
+    const wall = createWaterWall();
+    this.scene.add(wall.mesh);
     const tracers = new TracerPool(this.scene);
     const flash = new MuzzleFlash(rifle);
     this.events.on('shot', (shot) => {
@@ -186,6 +189,7 @@ export class Game {
       this.elapsed += dt;
       this.zone.update(dt);
       water.update(this.zone.current, this.elapsed);
+      wall.update(this.zone.current);
       this.zoneDamage.update(dt);
       this.bots.update(dt);
       this.ai.update(dt);
