@@ -23,6 +23,10 @@ export const bots = {
     /** Multiplies the chance when the target is jumping or falling. */
     airborneMultiplier: 0.4,
   },
+  /** A bot pulls the trigger this often while fighting, slower than the player's automatic fire. */
+  fireIntervalSeconds: 0.4,
+  /** Where a bot's hits land: this share on the head, this on the torso, the rest on the legs. */
+  regionOdds: { head: 0.1, torso: 0.6 },
   /** With nobody in sight a bot ambles around at this speed. */
   wanderSpeed: 1.5,
   /** Seconds between a wandering bot's changes of direction (min, max). */

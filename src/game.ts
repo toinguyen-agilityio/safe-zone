@@ -113,8 +113,11 @@ export class Game {
         feetY: this.player.y - config.player.eyeHeight,
         dead: this.player.dead,
         parachuting: this.player.parachuting,
+        running: this.player.sprinting,
+        airborne: this.player.airborne,
       }),
       config.world.defaultSeed,
+      this.events,
     );
     connectShotResolution(this.events, {
       obstacles: shotObstacles,
