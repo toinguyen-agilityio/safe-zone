@@ -26,6 +26,7 @@ import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
 import { createRng } from './core/rng';
 import { Aim } from './systems/aim';
+import { AiSystem } from './systems/ai-system';
 import { PickupSystem } from './systems/pickup-system';
 import { connectDamage } from './systems/damage-system';
 import { KillLog } from './systems/kill-log';
@@ -63,6 +64,8 @@ export class Game {
   readonly kills: KillLog;
   /** The 19 opponents; they drop in together with the player. */
   readonly bots: BotSystem;
+  /** Runs the bot brains: they hunt the nearest enemy in sight. */
+  readonly ai: AiSystem;
   readonly inventory = new Inventory(this.playerHealth);
   /** The items still lying on the sidewalks. */
   readonly pickups: PickupSystem;
@@ -98,8 +101,23 @@ export class Game {
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
     const motionWorld = createMotionWorld(getLayout());
     this.bots = BotSystem.create(config.world.defaultSeed, this.scene, motionWorld);
+    const shotObstacles = createShotObstacles(getLayout());
+    this.ai = new AiSystem(
+      this.bots,
+      motionWorld,
+      shotObstacles,
+      () => ({
+        id: 'player',
+        x: this.player.x,
+        z: this.player.z,
+        feetY: this.player.y - config.player.eyeHeight,
+        dead: this.player.dead,
+        parachuting: this.player.parachuting,
+      }),
+      config.world.defaultSeed,
+    );
     connectShotResolution(this.events, {
-      obstacles: createShotObstacles(getLayout()),
+      obstacles: shotObstacles,
       targets: () => this.bots.alive,
     });
     connectDamage(this.events, {
@@ -129,6 +147,7 @@ export class Game {
     this.addUpdate((dt) => {
       this.elapsed += dt;
       this.bots.update(dt);
+      this.ai.update(dt);
       tracers.update(dt);
       flash.update(dt);
       updatePlayerMotion(
