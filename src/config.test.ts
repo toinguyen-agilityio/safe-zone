@@ -89,6 +89,7 @@ describe('config', () => {
     expect(config.bots.wanderSpeed).toBe(1.5);
     expect(config.bots.wanderTurnSeconds).toEqual({ min: 2, max: 5 });
     expect(config.ui.killFeedMax).toBe(5);
+    expect(config.ui.bannerSeconds).toBe(4);
   });
 
   it('defines zone values', () => {
