@@ -1,6 +1,9 @@
 import { AmbientLight, DirectionalLight, Group } from 'three';
+import { config } from '../config';
+import { generateHouses } from '../world/houses';
 import type { Layout } from '../world/types';
 import { buildGround } from './ground';
+import { buildHouses } from './houses';
 import { buildRiver } from './river';
 
 /** The single place render tasks add their parts of the world. */
@@ -15,5 +18,6 @@ export function buildWorldScene(layout: Layout): Group {
 
   root.add(buildGround(layout));
   root.add(buildRiver(layout));
+  root.add(buildHouses(generateHouses(layout, config.world.defaultSeed).houses));
   return root;
 }
