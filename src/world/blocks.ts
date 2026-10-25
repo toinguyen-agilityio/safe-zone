@@ -67,6 +67,16 @@ export function computeBlocks(layout: Layout): Rect[] {
         if (east > x0) blocks.push(rectFromBounds(x0, east, bz0, bz1));
       }
     }
+    if (!nextToRiver) continue;
+    // East-west streets end before the river, so the land past their ends is also a block.
+    for (const street of eastWest) {
+      const start = Math.max(x0, street.cx + street.width / 2);
+      const band: Interval = [street.cz - street.depth / 2, street.cz + street.depth / 2];
+      for (const [bz0, bz1] of gaps(bridgeBands, band[0], band[1])) {
+        const east = westBankMin(layout, bz0, bz1);
+        if (east > start) blocks.push(rectFromBounds(start, east, bz0, bz1));
+      }
+    }
   }
   return blocks;
 }
