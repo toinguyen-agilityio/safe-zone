@@ -11,8 +11,14 @@ export interface Player {
   z: number;
   yaw: number;
   pitch: number;
-  /** In the river with the feet below the water. Set each frame by the game. */
+  /** Upward speed of the feet; negative while falling. */
+  vy: number;
+  /** In the river with the feet below the water. */
   swimming: boolean;
+  /** Moving fast on foot: Shift is held, a direction key is down, and not swimming. */
+  sprinting: boolean;
+  /** The feet are off the ground, jumping or falling. */
+  airborne: boolean;
 }
 
 export interface PlayerInput {
@@ -20,6 +26,8 @@ export interface PlayerInput {
   mouseDelta: MouseDelta;
   /** True while the mouse is captured. Without it the player ignores keys and mouse. */
   locked: boolean;
+  /** Space is held. Optional so callers that do not jump can leave it out. */
+  jump?: boolean;
 }
 
 export function createPlayer(): Player {
@@ -29,7 +37,10 @@ export function createPlayer(): Player {
     z: config.player.spawn.z,
     yaw: 0,
     pitch: 0,
+    vy: 0,
     swimming: false,
+    sprinting: false,
+    airborne: false,
   };
 }
 

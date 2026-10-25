@@ -66,7 +66,7 @@ describe('updatePlayer', () => {
 describe('applyPlayerToCamera', () => {
   it('puts the camera at the eyes with the player yaw and pitch', () => {
     const camera = new PerspectiveCamera();
-    const player = { x: 3, y: 1.7, z: -4, yaw: 0.5, pitch: -0.2, swimming: false };
+    const player = { ...createPlayer(), x: 3, y: 1.7, z: -4, yaw: 0.5, pitch: -0.2 };
     applyPlayerToCamera(camera, player);
     expect(camera.position.toArray()).toEqual([3, 1.7, -4]);
     expect(camera.rotation.y).toBeCloseTo(0.5);
