@@ -40,6 +40,13 @@ describe('config', () => {
       headMultiplier: 2,
       fireIntervalSeconds: 0.1,
       startingReserve: 90,
+      hitboxes: {
+        legsTop: 0.9,
+        torsoTop: 1.5,
+        height: 1.8,
+        halfWidth: 0.35,
+        headHalfWidth: 0.2,
+      },
     });
   });
 
