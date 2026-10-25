@@ -17,6 +17,18 @@ export const world = {
     bedDepth: 4,
     waterLevel: -1.2,
   },
+  houses: {
+    /** Gap kept between houses and the street edge. */
+    margin: 0.5,
+    frontageMin: 4,
+    frontageMax: 6,
+    /** Narrowest house worth building; leftovers thinner than this become empty lot. */
+    minFrontage: 3,
+    alleyWidth: 3,
+    /** An alley (kiet) crosses the block after this many houses (inclusive range). */
+    alleyEveryMin: 4,
+    alleyEveryMax: 7,
+  },
   /** Ground and river continue this far past the map edge so no gap shows. */
   edgePadding: 100,
   bridgeDeckWidth: 16,
