@@ -1,5 +1,6 @@
 import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
 import type { BridgeSpec } from '../world/bridges';
+import { buildBridgeDetails } from './bridge-details';
 
 const CONCRETE_COLOR = 0xb9b6ae;
 const DECK_THICKNESS = 0.6;
@@ -57,6 +58,7 @@ export function buildBridges(specs: BridgeSpec[]): Group {
 
     group.add(ramp(spec, spec.rampStartX, spec.deckStartX, material));
     group.add(ramp(spec, spec.rampEndX, spec.deckEndX, material));
+    group.add(buildBridgeDetails(spec));
     root.add(group);
   }
   return root;
