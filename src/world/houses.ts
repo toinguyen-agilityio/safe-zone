@@ -1,13 +1,18 @@
 import { config } from '../config';
 import { createRng, type Rng } from '../core/rng';
 import { computeBlocks } from './blocks';
+import { riverCenterX } from './layout';
 import type { Layout, Rect } from './types';
 
 const { houses: settings } = config.world;
 
+export interface House extends Rect {
+  height: number;
+}
+
 export interface HouseLayout {
   /** Tube houses (nha ong): narrow frontage, long depth, built in two back-to-back rows. */
-  houses: Rect[];
+  houses: House[];
   /** Alleys (kiet) that cross a block between houses. */
   alleys: Rect[];
 }
@@ -26,7 +31,7 @@ function strip(
     : { cx: block.cx + v + vLen / 2, cz: block.cz + u + uLen / 2, width: vLen, depth: uLen };
 }
 
-function fillBlock(block: Rect, rng: Rng, out: HouseLayout): void {
+function fillBlock(block: Rect, rng: Rng, out: { houses: Rect[]; alleys: Rect[] }): void {
   const alongX = block.width >= block.depth;
   const length = (alongX ? block.width : block.depth) - 2 * settings.margin;
   const across = (alongX ? block.depth : block.width) - 2 * settings.margin;
@@ -58,10 +63,28 @@ function fillBlock(block: Rect, rng: Rng, out: HouseLayout): void {
   }
 }
 
+function pickHeight(range: { min: number; max: number }, rng: Rng): number {
+  return range.min + rng.float() * (range.max - range.min);
+}
+
+/** Distance from a house's east edge to the river's west bank at the house's row. */
+function distanceToRiver(house: Rect, halfRiver: number): number {
+  return riverCenterX(house.cz) - halfRiver - (house.cx + house.width / 2);
+}
+
 /** The same seed always gives the same houses and alleys. */
 export function generateHouses(layout: Layout, seed: number): HouseLayout {
   const rng = createRng(seed);
-  const result: HouseLayout = { houses: [], alleys: [] };
-  for (const block of computeBlocks(layout)) fillBlock(block, rng, result);
-  return result;
+  const flat = { houses: [] as Rect[], alleys: [] as Rect[] };
+  for (const block of computeBlocks(layout)) fillBlock(block, rng, flat);
+
+  // Heights use their own stream so they never shift where houses stand.
+  const heightRng = createRng(seed ^ 0x9e3779b9);
+  const halfRiver = layout.river.width / 2;
+  const houses = flat.houses.map((house): House => {
+    const riverSide = distanceToRiver(house, halfRiver) <= settings.riverBand;
+    const range = riverSide ? settings.riverHeight : settings.innerHeight;
+    return { ...house, height: pickHeight(range, heightRng) };
+  });
+  return { houses, alleys: flat.alleys };
 }

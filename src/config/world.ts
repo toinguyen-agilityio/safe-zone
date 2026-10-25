@@ -28,6 +28,11 @@ export const world = {
     /** An alley (kiet) crosses the block after this many houses (inclusive range). */
     alleyEveryMin: 4,
     alleyEveryMax: 7,
+    /** Height range (world units) of houses in the inner blocks. */
+    innerHeight: { min: 6, max: 12 },
+    /** Houses within `riverBand` of the river bank become high-rises. */
+    riverBand: 40,
+    riverHeight: { min: 25, max: 45 },
   },
   /** Ground and river continue this far past the map edge so no gap shows. */
   edgePadding: 100,
