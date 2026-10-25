@@ -34,6 +34,8 @@ export class BotBrain {
   /** Health and armor at the last update, to notice damage. */
   private lastHealth: number | null = null;
   private underFireLeft = 0;
+  /** What the bot gave up on after being stuck for a long time, until the system reads it. */
+  private gaveUp: 'target' | 'destination' | null = null;
 
   private readonly strafer: Strafer;
   private readonly unsticker: Unsticker;
@@ -100,6 +102,11 @@ export class BotBrain {
     this.move(bot, around ?? toGoal, config.bots.walkSpeed, world, dt);
     // While steering round an obstacle the bot still looks at where it is going.
     bot.yaw = toGoal;
+    if (this.unsticker.longStuck) {
+      // Going round is not working: give up on this goal so the system picks another.
+      this.gaveUp = this.mode === 'travel' ? 'destination' : 'target';
+      this.unsticker.reset();
+    }
   }
 
   /**
@@ -129,6 +136,16 @@ export class BotBrain {
   private worthFighting(bot: Bot, target: TargetPosition): boolean {
     const close = Math.hypot(target.x - bot.x, target.z - bot.z) <= config.bots.zoneFightRange;
     return close || this.underFireLeft > 0;
+  }
+
+  /**
+   * What the bot gave up on since the last call, or null. The system answers a given up
+   * destination with a new one and a given up target by choosing someone else.
+   */
+  takeGiveUp(): 'target' | 'destination' | null {
+    const gave = this.gaveUp;
+    this.gaveUp = null;
+    return gave;
   }
 
   /** True for a few seconds after the bot took damage. */

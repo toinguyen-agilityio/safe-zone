@@ -1,3 +1,4 @@
+import { config } from '../config';
 import { createRng } from '../core/rng';
 import type { EventBus } from '../core/events';
 import { BotBrain } from '../ai/bot-brain';
@@ -16,6 +17,9 @@ interface BotMind {
   brain: BotBrain;
   fire: BotFire;
   mover: ZoneMover;
+  /** An enemy this bot could not reach, ignored until `avoidLeft` runs out. */
+  avoid: string | null;
+  avoidLeft: number;
   target: Combatant | null;
   retargetLeft: number;
 }
@@ -54,12 +58,16 @@ export class AiSystem {
       const mind = this.mindOf(bot);
 
       mind.retargetLeft -= dt;
+      mind.avoidLeft = Math.max(0, mind.avoidLeft - dt);
+      if (mind.avoidLeft === 0) mind.avoid = null;
       const lost =
         mind.target?.dead || (mind.target && !this.stillThere(mind.target, alive, player));
       if (mind.retargetLeft <= 0 || lost) {
         // Stagger the looks so the bots do not all search in the same frame.
         mind.retargetLeft = RETARGET_SECONDS + (index % 5) * 0.01;
-        const candidates: Combatant[] = player ? [player, ...alive] : [...alive];
+        const candidates: Combatant[] = (player ? [player, ...alive] : [...alive]).filter(
+          (c) => c.id !== mind.avoid,
+        );
         mind.target = pickTarget(bot, candidates, this.obstacles);
       }
 
@@ -68,7 +76,21 @@ export class AiSystem {
       const goal = mind.mover.update(bot, this.zone(), this.world.collision);
       mind.brain.update(bot, current ?? null, this.world.collision, dt, goal);
       mind.fire.update(dt, bot, current ?? null, mind.brain.mode === 'engage');
+      this.handleGiveUp(mind);
       bot.feetY = this.world.groundHeight(bot.x, bot.z, bot.feetY);
+    }
+  }
+
+  /** A bot stuck for too long drops its goal: a new destination, or someone else to fight. */
+  private handleGiveUp(mind: BotMind): void {
+    const gaveUp = mind.brain.takeGiveUp();
+    if (gaveUp === 'destination') {
+      mind.mover.reroll();
+    } else if (gaveUp === 'target' && mind.target) {
+      mind.avoid = mind.target.id;
+      mind.avoidLeft = config.bots.avoidSeconds;
+      mind.target = null;
+      mind.retargetLeft = 0;
     }
   }
 
@@ -80,6 +102,8 @@ export class AiSystem {
         brain: new BotBrain(createRng(seed)),
         fire: new BotFire(createRng(seed ^ 0xf17e), this.events),
         mover: new ZoneMover(createRng(seed ^ 0x20ee)),
+        avoid: null,
+        avoidLeft: 0,
         target: null,
         retargetLeft: 0,
       };

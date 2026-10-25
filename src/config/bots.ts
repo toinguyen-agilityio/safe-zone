@@ -40,9 +40,11 @@ export const bots = {
   /** A bot that took damage counts as under fire for this many seconds. */
   underFireSeconds: 3,
   /** A bot is stuck when it gets less than `progress` closer to its goal for `seconds`. */
-  stuck: { progress: 0.5, seconds: 2, longSeconds: 6 },
+  stuck: { progress: 0.5, seconds: 2, longSeconds: 40 },
   /** A stuck bot follows the wall; it tests whether a way is open by a step this long. */
   unstick: { probeStep: 0.6 },
+  /** After giving up on an enemy it could not reach, a bot ignores that enemy this long. */
+  avoidSeconds: 15,
   /** With nobody in sight a bot ambles around at this speed. */
   wanderSpeed: 1.5,
   /** Seconds between a wandering bot's changes of direction (min, max). */
