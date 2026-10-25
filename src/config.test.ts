@@ -91,6 +91,7 @@ describe('config', () => {
     expect(config.ui.killFeedMax).toBe(5);
     expect(config.ui.bannerSeconds).toBe(4);
     expect(config.ui.toastSeconds).toBe(2);
+    expect(config.ui.minimap).toEqual({ size: 180, scale: 0.6 });
   });
 
   it('defines zone values', () => {
