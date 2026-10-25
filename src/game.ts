@@ -9,6 +9,8 @@ import { installAudio } from './audio/audio-context';
 import { connectSounds } from './audio/sound-system';
 import { Health } from './entities/health';
 import { Inventory } from './entities/inventory';
+import { Healing } from './systems/healing';
+import { HealingSystem } from './systems/healing-system';
 import { Weapon } from './entities/weapon';
 import {
   applyAimToCamera,
@@ -79,6 +81,8 @@ export class Game {
   readonly inventory = new Inventory(this.playerHealth);
   /** The items still lying on the sidewalks. */
   readonly pickups: PickupSystem;
+  /** Keys 1 and 2 eat and drink to heal. */
+  readonly healing: HealingSystem;
   /** Seconds of play so far, written on each kill. */
   private elapsed = 0;
   private readonly loop: GameLoop;
@@ -132,6 +136,11 @@ export class Game {
       now: () => this.elapsed,
       events: this.events,
     });
+    this.healing = new HealingSystem(
+      new Healing(this.playerHealth, this.inventory),
+      this.input,
+      this.events,
+    );
     this.pickups = new PickupSystem(generateLoot(getLayout()), this.events);
     // The items lie on the sidewalks until someone walks over them.
     const loot = new LootRenderer(this.pickups.items);
@@ -200,13 +209,17 @@ export class Game {
       this.ai.update(dt);
       tracers.update(dt);
       flash.update(dt);
+      // No sprinting while eating or drinking.
+      const moveKeys = readMoveKeys(this.input);
+      if (this.healing.busy) moveKeys.sprint = false;
       updatePlayerMotion(
         this.player,
         {
-          keys: readMoveKeys(this.input),
+          keys: moveKeys,
           mouseDelta: this.input.consumeMouseDelta(),
           locked: this.input.pointerLocked,
           jump: this.input.isDown('Space'),
+          speedMultiplier: this.healing.moveMultiplier,
         },
         motionWorld,
         dt,
@@ -220,7 +233,12 @@ export class Game {
       if (!this.player.dead && !this.player.parachuting) {
         this.pickups.update(this.player, this.inventory);
       }
-      fireControl.update(dt, this.input.pointerLocked);
+      const shots = fireControl.update(dt, this.input.pointerLocked);
+      this.healing.update(dt, {
+        locked: this.input.pointerLocked,
+        shots,
+        blocked: this.player.dead || this.player.parachuting || this.player.swimming,
+      });
       placeViewmodel(rifle, this.aim.amount);
       applyAimToCamera(this.camera, this.aim.amount);
       updateCanopy(canopy, this.player);
