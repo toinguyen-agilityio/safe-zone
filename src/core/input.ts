@@ -21,7 +21,12 @@ export class Input {
   private readonly clickHandlers = new Set<() => void>();
   private deltaX = 0;
   private deltaY = 0;
-  /** Browsers can report a large jump in the first mouse event after the lock starts. */
+  /**
+   * Browsers can report a large jump in a mouse event right as the lock starts, before or after
+   * the lock change event. Movement counts only once the lock change was seen, and the first
+   * event after it is dropped too.
+   */
+  private engaged = false;
   private skipNextMove = false;
 
   constructor(
@@ -71,7 +76,7 @@ export class Input {
   }
 
   private onMouseMove(event: MouseEvent): void {
-    if (!this.pointerLocked) return;
+    if (!this.pointerLocked || !this.engaged) return;
     if (this.skipNextMove) {
       this.skipNextMove = false;
       return;
@@ -83,9 +88,11 @@ export class Input {
   /** Releasing the mouse (Esc) must not leave keys stuck down. */
   private onPointerLockChange(): void {
     if (this.pointerLocked) {
+      this.engaged = true;
       this.skipNextMove = true;
       return;
     }
+    this.engaged = false;
     this.skipNextMove = false;
     this.keys.clear();
     this.buttons.clear();

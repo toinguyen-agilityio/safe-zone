@@ -9,6 +9,8 @@ export interface UiContext {
   events: EventBus;
   player: Player;
   pause: Pause;
+  /** Ask the browser to capture the mouse again. Needs a click or key press to work. */
+  requestPointerLock: () => void;
 }
 
 /** A widget file exports `mount`. It may return a function that removes the widget. */

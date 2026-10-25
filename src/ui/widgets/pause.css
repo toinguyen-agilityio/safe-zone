@@ -1,0 +1,23 @@
+.pause-screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.65);
+  cursor: pointer;
+}
+
+.pause-screen h1 {
+  margin: 0;
+  font-size: 48px;
+  letter-spacing: 2px;
+}
+
+.pause-screen p {
+  margin: 0;
+  font-size: 20px;
+  opacity: 0.85;
+}
