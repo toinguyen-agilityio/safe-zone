@@ -5,6 +5,7 @@ import { GameLoop } from './core/loop';
 import { Pause, runUpdates } from './core/pause';
 import { Input } from './core/input';
 import { createParachutingPlayer } from './entities/player';
+import { Weapon } from './entities/weapon';
 import { applyPlayerToCamera } from './render/first-person-camera';
 import { buildCanopy, updateCanopy } from './render/parachute';
 import { createFpsMeter } from './ui/fps-meter';
@@ -12,6 +13,7 @@ import { mountUi } from './ui/mount';
 import { createRenderer } from './render/renderer';
 import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
+import { FireControl } from './systems/fire-control';
 import { createMotionWorld, updatePlayerMotion } from './systems/player-motion';
 import { getLayout } from './world/layout';
 
@@ -33,6 +35,7 @@ export class Game {
   readonly events = new EventBus();
   readonly pause = new Pause();
   readonly input: Input;
+  readonly weapon = new Weapon();
   readonly player = createParachutingPlayer(config.world.defaultSeed);
   private readonly loop: GameLoop;
 
@@ -48,6 +51,7 @@ export class Game {
     this.scene.add(buildWorldScene(getLayout()));
     this.input = new Input(document, this.renderer.domElement);
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
+    const fireControl = new FireControl(this.weapon, this.player, this.input, this.events);
     const motionWorld = createMotionWorld(getLayout());
     const canopy = buildCanopy();
     this.scene.add(canopy);
@@ -63,6 +67,7 @@ export class Game {
         motionWorld,
         dt,
       );
+      fireControl.update(dt, this.input.pointerLocked);
       updateCanopy(canopy, this.player);
       applyPlayerToCamera(this.camera, this.player);
     });
