@@ -27,6 +27,9 @@ export interface UiContext {
     stage: 'wait' | 'shrink' | 'done';
     /** Seconds left in the current wait or shrink. */
     stageLeft: number;
+    /** The dry zone now, and the circle it is shrinking to (null after the last shrink). */
+    current: { center: { x: number; z: number }; radius: number };
+    next: { center: { x: number; z: number }; radius: number } | null;
   };
   /** Ask the browser to capture the mouse again. Needs a click or key press to work. */
   requestPointerLock: () => void;
