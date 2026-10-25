@@ -27,6 +27,12 @@ export interface Railing {
   height: number;
 }
 
+export interface Anchor {
+  x: number;
+  y: number;
+  z: number;
+}
+
 export interface BridgeSpec {
   id: BridgeId;
   name: string;
@@ -43,6 +49,8 @@ export interface BridgeSpec {
   rampLength: number;
   pillars: Pillar[];
   railings: Railing[];
+  /** Dragon Bridge only: where the dragon's head stands, the source for the deferred fire event. */
+  dragonHeadAnchor?: Anchor;
 }
 
 function specFor(bridge: Bridge, layout: Layout): BridgeSpec {
@@ -68,6 +76,9 @@ function specFor(bridge: Bridge, layout: Layout): BridgeSpec {
     height: world.bridgeRailingHeight,
   }));
 
+  const dragonHeadAnchor: Anchor | undefined =
+    bridge.id === 'dragon' ? { x: bridge.xEnd, y: world.dragon.clearance, z: bridge.z } : undefined;
+
   return {
     id: bridge.id,
     name: NAMES[bridge.id],
@@ -81,6 +92,7 @@ function specFor(bridge: Bridge, layout: Layout): BridgeSpec {
     rampLength: bridge.rampLength,
     pillars,
     railings,
+    ...(dragonHeadAnchor ? { dragonHeadAnchor } : {}),
   };
 }
 

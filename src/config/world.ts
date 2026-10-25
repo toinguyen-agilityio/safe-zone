@@ -54,4 +54,11 @@ export const world = {
   bridgePillarSpacing: 18,
   bridgePillarRadius: 1.2,
   bridgeRailingHeight: 1.1,
+  dragon: {
+    /** How far the dragon floats above the bridge surface. */
+    clearance: 4.5,
+    bodyRadius: 2.4,
+    headLength: 10,
+    tailLength: 15,
+  },
 } as const;
