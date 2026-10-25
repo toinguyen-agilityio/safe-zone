@@ -29,6 +29,7 @@ import { Aim } from './systems/aim';
 import { AiSystem } from './systems/ai-system';
 import { PickupSystem } from './systems/pickup-system';
 import { connectDamage } from './systems/damage-system';
+import { zoneInfo } from './ai/zone-move';
 import { ZoneSystem } from './systems/zone-system';
 import { KillLog } from './systems/kill-log';
 import { FireControl } from './systems/fire-control';
@@ -122,6 +123,7 @@ export class Game {
       }),
       config.world.defaultSeed,
       this.events,
+      () => zoneInfo(this.zone),
     );
     connectShotResolution(this.events, {
       obstacles: shotObstacles,

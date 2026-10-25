@@ -31,6 +31,10 @@ export const bots = {
   strafeSpeed: 2.5,
   /** Seconds between a strafing bot's changes of direction (min, max). */
   strafeTurnSeconds: { min: 0.8, max: 2.2 },
+  /** Bots outside the next dry zone start walking to it this long before the water starts to rise. */
+  zoneWarningSeconds: 20,
+  /** A bot walking to a destination is there when it is this close. */
+  arriveDistance: 2,
   /** With nobody in sight a bot ambles around at this speed. */
   wanderSpeed: 1.5,
   /** Seconds between a wandering bot's changes of direction (min, max). */
