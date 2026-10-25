@@ -6,6 +6,19 @@ import type { ZoneCircle } from '../systems/zone-system';
 export const WATER_HEIGHT = 0.4;
 /** The water fades in over this width at the edge of the dry zone. */
 export const EDGE_WIDTH = 1.5;
+/** The white foam band is this wide, measured outward from the dry zone's edge. */
+export const FOAM_WIDTH = 3;
+
+/**
+ * How much foam covers a spot: 1 right at the edge of the dry zone, fading to 0 at `FOAM_WIDTH`
+ * outside it, and 0 inside the dry zone. The shader does the same sum.
+ */
+export function foamFactor(distanceFromCenter: number, radius: number): number {
+  const outside = distanceFromCenter - radius;
+  if (outside < 0) return 0;
+  const t = Math.min(outside / FOAM_WIDTH, 1);
+  return 1 - t * t * (3 - 2 * t);
+}
 
 const vertexShader = /* glsl */ `
   varying vec2 vWorld;
@@ -29,7 +42,11 @@ const fragmentShader = /* glsl */ `
     float ripple = 0.5 + 0.5 * sin(vWorld.x * 0.9 + uTime * 1.6) * sin(vWorld.y * 0.8 - uTime * 1.2);
     vec3 deep = vec3(0.10, 0.32, 0.45);
     vec3 shallow = vec3(0.28, 0.55, 0.62);
-    gl_FragColor = vec4(mix(deep, shallow, ripple * 0.5), 0.78 * edge);
+    vec3 water = mix(deep, shallow, ripple * 0.5);
+    // White foam along the line where the water meets the dry ground.
+    float foam = 1.0 - smoothstep(0.0, ${FOAM_WIDTH.toFixed(2)}, d - uRadius);
+    foam *= 0.75 + 0.25 * ripple;
+    gl_FragColor = vec4(mix(water, vec3(1.0), foam), mix(0.78 * edge, 0.95, foam));
   }
 `;
 
