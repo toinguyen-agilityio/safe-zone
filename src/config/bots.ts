@@ -39,6 +39,8 @@ export const bots = {
   zoneFightRange: 40,
   /** A bot that took damage counts as under fire for this many seconds. */
   underFireSeconds: 3,
+  /** A bot is stuck when it gets less than `progress` closer to its goal for `seconds`. */
+  stuck: { progress: 0.5, seconds: 2, longSeconds: 6 },
   /** With nobody in sight a bot ambles around at this speed. */
   wanderSpeed: 1.5,
   /** Seconds between a wandering bot's changes of direction (min, max). */
