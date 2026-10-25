@@ -17,6 +17,7 @@ import {
 } from './render/first-person-camera';
 import { createFloodWater } from './render/flood-water';
 import { createWaterWall } from './render/water-wall';
+import { LootRenderer } from './render/loot';
 import { MuzzleFlash } from './render/muzzle-flash';
 import { TracerPool } from './render/tracer';
 import { buildCanopy, updateCanopy } from './render/parachute';
@@ -132,6 +133,10 @@ export class Game {
       events: this.events,
     });
     this.pickups = new PickupSystem(generateLoot(getLayout()), this.events);
+    // The items lie on the sidewalks until someone walks over them.
+    const loot = new LootRenderer(this.pickups.items);
+    this.scene.add(loot.group);
+    this.events.on('pickup', ({ item }) => loot.remove(item.id));
     // Browsers only allow sound after a click, so the audio context waits for the first one.
     installAudio(document);
     connectSounds(this.events);
