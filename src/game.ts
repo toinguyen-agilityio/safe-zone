@@ -6,6 +6,7 @@ import { Pause, runUpdates } from './core/pause';
 import { Input } from './core/input';
 import { createParachutingPlayer } from './entities/player';
 import { installAudio } from './audio/audio-context';
+import { connectSounds } from './audio/sound-system';
 import { Health } from './entities/health';
 import { Weapon } from './entities/weapon';
 import {
@@ -85,6 +86,7 @@ export class Game {
     this.kills = new KillLog(this.events);
     // Browsers only allow sound after a click, so the audio context waits for the first one.
     installAudio(document);
+    connectSounds(this.events);
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
     // There are no targets yet: bots add themselves to this list when they exist.
     connectShotResolution(this.events, {
