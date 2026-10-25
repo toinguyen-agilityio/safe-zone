@@ -38,6 +38,8 @@ describe('config', () => {
       magazineSize: 30,
       reloadSeconds: 1.8,
       headMultiplier: 2,
+      fireIntervalSeconds: 0.1,
+      startingReserve: 90,
     });
   });
 
