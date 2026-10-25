@@ -38,6 +38,11 @@ export class ZoneMover {
 
   constructor(private readonly rng: Rng) {}
 
+  /** Forget the current destination so the next update picks a different one. */
+  reroll(): void {
+    this.destination = null;
+  }
+
   /** The point to walk to now, or null when the bot has nowhere it must go. */
   update(
     bot: { x: number; z: number },
