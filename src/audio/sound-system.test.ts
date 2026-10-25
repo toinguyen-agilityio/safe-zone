@@ -19,6 +19,7 @@ function setup() {
   const stop = connectSounds(events, {
     playShot: () => log.push('shot'),
     playHit: () => log.push('hit'),
+    playPickup: () => log.push('pickup'),
   });
   return { events, log, stop };
 }
