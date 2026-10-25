@@ -16,6 +16,8 @@ describe('config', () => {
       armorMax: 60,
       armorBlock: 0.45,
       parachuteStartHeight: 75,
+      lookSensitivity: 0.0022,
+      pitchLimitDegrees: 85,
     });
   });
 
