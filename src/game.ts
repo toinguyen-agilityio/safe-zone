@@ -2,6 +2,7 @@ import { PerspectiveCamera, Scene, type WebGLRenderer } from 'three';
 import { config } from './config';
 import { GameLoop } from './core/loop';
 import { placeOverheadCamera } from './render/overhead-camera';
+import { createFpsMeter } from './ui/fps-meter';
 import { createRenderer } from './render/renderer';
 import { buildWorldScene } from './render/world-scene';
 import { getLayout } from './world/layout';
@@ -29,6 +30,8 @@ export class Game {
     document.addEventListener('visibilitychange', () => this.loop.resetClock());
     this.scene.add(buildWorldScene(getLayout()));
     placeOverheadCamera(this.camera, config.world.mapSize);
+    const fps = createFpsMeter(window.location.search, container);
+    if (fps) this.addUpdate((dt) => fps.update(dt));
     this.resize();
   }
 
