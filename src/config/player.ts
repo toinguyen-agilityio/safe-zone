@@ -3,6 +3,8 @@ export const player = {
   armorMax: 60,
   armorBlock: 0.45,
   parachuteStartHeight: 75,
+  /** Radius of the circle the player occupies on the ground. */
+  radius: 0.4,
   /** Height of the eyes above the ground. */
   eyeHeight: 1.7,
   /** Where the player stands before the parachute drop exists: a street crossing. */

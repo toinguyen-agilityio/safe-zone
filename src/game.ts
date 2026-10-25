@@ -11,6 +11,7 @@ import { mountUi } from './ui/mount';
 import { createRenderer } from './render/renderer';
 import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
+import { collidePlayer, createCollisionWorld } from './systems/player-collision';
 import { getLayout } from './world/layout';
 
 declare module './core/events' {
@@ -46,7 +47,9 @@ export class Game {
     this.scene.add(buildWorldScene(getLayout()));
     this.input = new Input(document, this.renderer.domElement);
     // The overhead camera stays in render/overhead-camera.ts for the menu; play uses the eyes.
+    const collisionWorld = createCollisionWorld(getLayout());
     this.addUpdate((dt) => {
+      const previous = { x: this.player.x, z: this.player.z };
       updatePlayer(
         this.player,
         {
@@ -56,6 +59,7 @@ export class Game {
         },
         dt,
       );
+      collidePlayer(this.player, previous, collisionWorld);
       applyPlayerToCamera(this.camera, this.player);
     });
     applyPlayerToCamera(this.camera, this.player);
