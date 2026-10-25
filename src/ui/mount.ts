@@ -1,7 +1,9 @@
 import type { EventBus } from '../core/events';
 import type { Pause } from '../core/pause';
 import type { Health } from '../entities/health';
+import type { Inventory } from '../entities/inventory';
 import type { Player } from '../entities/player';
+import type { Weapon } from '../entities/weapon';
 import './ui-root.css';
 
 /** What every widget gets: its place on screen, the event bus and the game state. */
@@ -12,6 +14,9 @@ export interface UiContext {
   pause: Pause;
   /** The player's health and armor, for the HUD. */
   health?: Health;
+  /** The rifle and the bag, for the ammo and item counts. */
+  weapon?: Weapon;
+  inventory?: Inventory;
   /** The flood zone, for widgets that react to standing outside the dry zone. */
   zone?: { isDry: (x: number, z: number) => boolean };
   /** Ask the browser to capture the mouse again. Needs a click or key press to work. */
