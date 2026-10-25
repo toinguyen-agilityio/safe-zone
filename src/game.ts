@@ -252,6 +252,7 @@ export class Game {
       events: this.events,
       player: this.player,
       pause: this.pause,
+      health: this.playerHealth,
       zone: this.zone,
       requestPointerLock: () => this.renderer.domElement.requestPointerLock(),
     });
