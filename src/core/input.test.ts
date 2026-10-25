@@ -96,6 +96,16 @@ describe('Input first move after lock', () => {
     expect(input.consumeMouseDelta()).toEqual({ x: 2, y: 3 });
   });
 
+  it('ignores a jumpy event that arrives before the lock change event', () => {
+    const { doc, input } = setup();
+    doc.pointerLockElement = (input as unknown as { element: unknown }).element;
+    doc.dispatchEvent(event('mousemove', { movementX: -500, movementY: -350 }));
+    doc.dispatchEvent(event('pointerlockchange'));
+    doc.dispatchEvent(event('mousemove', { movementX: 0, movementY: 0 }));
+    doc.dispatchEvent(event('mousemove', { movementX: 2, movementY: 3 }));
+    expect(input.consumeMouseDelta()).toEqual({ x: 2, y: 3 });
+  });
+
   it('ignores it again after a second lock', () => {
     const { doc, input, lock, unlock } = setup();
     lock();

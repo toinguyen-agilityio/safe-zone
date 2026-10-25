@@ -12,6 +12,7 @@ const makeContext = (): UiContext => ({
   events: new EventBus(),
   player: createPlayer(),
   pause: new Pause(),
+  requestPointerLock: () => {},
 });
 
 describe('createUiRoot', () => {
@@ -86,7 +87,12 @@ describe('mountUi', () => {
       let mounted = 0;
       const unmount = mountUi(
         parent,
-        { events: new EventBus(), player: createPlayer(), pause: new Pause() },
+        {
+          events: new EventBus(),
+          player: createPlayer(),
+          pause: new Pause(),
+          requestPointerLock: () => {},
+        },
         [{ mount: () => void mounted++ }],
       );
       expect(added).toHaveLength(1);

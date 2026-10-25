@@ -13,6 +13,13 @@ import { buildWorldScene } from './render/world-scene';
 import { readMoveKeys } from './systems/movement';
 import { getLayout } from './world/layout';
 
+declare module './core/events' {
+  interface EventMap {
+    /** The mouse was captured (true) or released (false), for example by Esc. */
+    pointerlock: { locked: boolean };
+  }
+}
+
 export type UpdateFn = (dt: number) => void;
 
 /** Owns the renderer, scene, camera and loop. Features register update functions. */
@@ -52,7 +59,15 @@ export class Game {
       applyPlayerToCamera(this.camera, this.player);
     });
     applyPlayerToCamera(this.camera, this.player);
-    mountUi(container, { events: this.events, player: this.player, pause: this.pause });
+    document.addEventListener('pointerlockchange', () =>
+      this.events.emit('pointerlock', { locked: this.input.pointerLocked }),
+    );
+    mountUi(container, {
+      events: this.events,
+      player: this.player,
+      pause: this.pause,
+      requestPointerLock: () => this.renderer.domElement.requestPointerLock(),
+    });
     const fps = createFpsMeter(window.location.search, container);
     if (fps) this.addUpdate((dt) => fps.update(dt));
     this.resize();
