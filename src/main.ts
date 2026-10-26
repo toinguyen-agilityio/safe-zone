@@ -7,6 +7,5 @@ if (!container) {
 
 const game = new Game(container);
 game.start();
-// The page opens in the menu. Until the start screen has its button, the match begins at once;
-// add ?menu to the address to stay in the menu.
-if (!new URLSearchParams(window.location.search).has('menu')) game.enterMatch();
+// The page opens on the start screen. Add ?autostart to the address to skip it while developing.
+if (new URLSearchParams(window.location.search).has('autostart')) game.enterMatch();

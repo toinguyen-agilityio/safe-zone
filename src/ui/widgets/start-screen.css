@@ -1,0 +1,78 @@
+.start-screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: radial-gradient(ellipse at center, rgba(16, 52, 80, 0.88), rgba(4, 14, 24, 0.96));
+  text-align: center;
+}
+
+.start-screen.start-screen-show {
+  display: flex;
+}
+
+.start-screen h1 {
+  margin: 0;
+  font-size: 56px;
+  letter-spacing: 2px;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.7);
+}
+
+.start-screen-tagline {
+  margin: 0;
+  font-size: 20px;
+  opacity: 0.9;
+}
+
+.start-screen-description {
+  margin: 0;
+  max-width: 640px;
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.start-screen-controls {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 6px 18px;
+  padding: 14px 24px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  text-align: left;
+  font-size: 15px;
+}
+
+.start-screen-controls h2 {
+  grid-column: 1 / -1;
+  margin: 0 0 4px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.start-screen-key {
+  font-weight: 700;
+  color: #ffd400;
+  text-align: right;
+}
+
+.start-screen-enter {
+  margin-top: 8px;
+  padding: 14px 44px;
+  border: 0;
+  border-radius: 8px;
+  background: #e0a526;
+  color: #1c1204;
+  font-size: 22px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.start-screen-enter:hover {
+  background: #f2b83a;
+}

@@ -12,6 +12,11 @@ export interface UiContext {
   events: EventBus;
   player: Player;
   pause: Pause;
+  /** The app phase and the way into the match, for the start screen. */
+  app?: {
+    readonly state: 'menu' | 'match' | 'ended';
+    enterMatch: () => boolean;
+  };
   /** The display name of the player or a bot, for the kill feed. */
   nameOf?: (id: string) => string;
   /** The player's health and armor, for the HUD. */

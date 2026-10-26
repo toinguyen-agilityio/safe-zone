@@ -256,11 +256,18 @@ export class Game {
     document.addEventListener('pointerlockchange', () =>
       this.events.emit('pointerlock', { locked: this.input.pointerLocked }),
     );
+    const app = this.app;
     mountUi(container, {
       events: this.events,
       player: this.player,
       pause: this.pause,
       health: this.playerHealth,
+      app: {
+        get state() {
+          return app.state;
+        },
+        enterMatch: () => this.enterMatch(),
+      },
       nameOf: (id) =>
         id === 'player' ? 'Bạn' : (this.bots.all.find((b) => b.id === id)?.name ?? id),
       weapon: this.weapon,
