@@ -300,7 +300,7 @@ export class Game {
           return app.state;
         },
         enterMatch: () => this.enterMatch(),
-        replay: () => this.onReplay?.(),
+        replay: () => this.replay(),
       },
       results: () => this.results.result,
       nameOf: (id) =>
@@ -314,6 +314,11 @@ export class Game {
     const fps = createFpsMeter(window.location.search, container);
     if (fps) this.addUpdate((dt) => fps.update(dt));
     this.resize();
+  }
+
+  /** Ask for another match: the app disposes this game and starts a fresh one. */
+  replay(): void {
+    this.onReplay?.();
   }
 
   /** Capture the mouse. The browser only allows it from a click or key press. */
