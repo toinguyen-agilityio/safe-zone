@@ -1,6 +1,7 @@
 import { ShaderMaterial } from 'three';
 import { describe, expect, it } from 'vitest';
-import { createFloodWater, EDGE_WIDTH, FOAM_WIDTH, foamFactor } from './flood-water';
+import { config } from '../config';
+import { createFloodWater, EDGE_WIDTH, floodVisible, FOAM_WIDTH, foamFactor } from './flood-water';
 
 describe('foamFactor', () => {
   it('is full right at the edge of the dry zone', () => {
@@ -44,5 +45,29 @@ describe('the water shader', () => {
     const material = createFloodWater().mesh.material as ShaderMaterial;
     expect(material.fragmentShader).toContain('foam');
     expect(material.fragmentShader).toContain(FOAM_WIDTH.toFixed(2));
+  });
+});
+
+describe('floodVisible', () => {
+  const half = config.world.mapSize / 2;
+
+  it('is false while the dry zone covers the whole map', () => {
+    expect(floodVisible({ center: { x: 0, z: 0 }, radius: config.zone.startRadius })).toBe(false);
+  });
+
+  it('is true once the zone has shrunk, so there is water to see', () => {
+    expect(floodVisible({ center: { x: 0, z: 0 }, radius: config.zone.radii[0] })).toBe(true);
+    expect(floodVisible({ center: { x: 60, z: -40 }, radius: 130 })).toBe(true);
+  });
+
+  it('is true from the moment the circle no longer reaches a corner of the map', () => {
+    const corner = Math.hypot(half, half);
+    expect(floodVisible({ center: { x: 0, z: 0 }, radius: corner + 1 })).toBe(false);
+    expect(floodVisible({ center: { x: 0, z: 0 }, radius: corner - 1 })).toBe(true);
+  });
+
+  it('takes the center into account: off to one side, the far corner is farther', () => {
+    const corner = Math.hypot(half, half);
+    expect(floodVisible({ center: { x: 100, z: 0 }, radius: corner + 1 })).toBe(true);
   });
 });

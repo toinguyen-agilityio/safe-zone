@@ -55,6 +55,17 @@ export function floodUniforms(zone: ZoneCircle): { center: [number, number]; rad
   return { center: [zone.center.x, zone.center.z], radius: zone.radius };
 }
 
+/**
+ * Is there any flood to draw? While the dry zone still covers the whole square map there is no water
+ * to see, so the plane and the wall can be left out of the frame altogether.
+ */
+export function floodVisible(zone: ZoneCircle): boolean {
+  const half = config.world.mapSize / 2;
+  // The farthest corner of the map from the center of the zone.
+  const reach = Math.hypot(Math.abs(zone.center.x) + half, Math.abs(zone.center.z) + half);
+  return zone.radius < reach;
+}
+
 export interface FloodWater {
   mesh: Mesh;
   /** Follow the zone: call every frame with the current circle and the time in seconds. */
