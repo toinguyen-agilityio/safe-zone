@@ -2,6 +2,8 @@ export const world = {
   mapSize: 640,
   defaultSeed: 20261023,
   maxDt: 0.05,
+  /** The renderer draws at most this many pixels per CSS pixel, however sharp the display. */
+  maxPixelRatio: 1.5,
   /** Side of a cell in the grid that finds nearby boxes. */
   gridCellSize: 16,
   streetWidth: 14,
