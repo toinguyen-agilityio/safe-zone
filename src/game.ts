@@ -1,6 +1,7 @@
 import { PerspectiveCamera, Scene, type WebGLRenderer } from 'three';
 import { config } from './config';
 import { AppState } from './core/app-state';
+import { isTouchDevice } from './core/device';
 import { EventBus } from './core/events';
 import { GameLoop } from './core/loop';
 import { Pause, runUpdates } from './core/pause';
@@ -66,7 +67,7 @@ export class Game {
   private readonly updates: UpdateFn[] = [];
   readonly events = new EventBus();
   /** The page opens in the menu; the match, with its parachute drop, starts on `enterMatch`. */
-  readonly app = new AppState(this.events);
+  readonly app = new AppState(this.events, () => !isTouchDevice());
   readonly pause = new Pause();
   readonly input: Input;
   readonly weapon = new Weapon();
@@ -272,6 +273,7 @@ export class Game {
       player: this.player,
       pause: this.pause,
       health: this.playerHealth,
+      touch: isTouchDevice(),
       app: {
         get state() {
           return app.state;
