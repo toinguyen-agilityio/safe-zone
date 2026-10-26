@@ -2,6 +2,7 @@ import { PerspectiveCamera, Scene, type WebGLRenderer } from 'three';
 import { config } from './config';
 import { AppState } from './core/app-state';
 import { isTouchDevice } from './core/device';
+import { Disposer, disposeObject } from './core/match-reset';
 import { EventBus } from './core/events';
 import { GameLoop } from './core/loop';
 import { Pause, runUpdates } from './core/pause';
@@ -98,15 +99,25 @@ export class Game {
   private menuTime = 0;
   private readonly loop: GameLoop;
 
-  constructor(private readonly container: HTMLElement) {
+  /** Everything this game set up on the page, so a new game can replace it cleanly. */
+  private readonly cleanup = new Disposer();
+
+  /**
+   * `onReplay` is called when the player asks for another match from the end screen; it should
+   * dispose this game and start a new one.
+   */
+  constructor(
+    private readonly container: HTMLElement,
+    private readonly onReplay?: () => void,
+  ) {
     this.renderer = createRenderer(container);
     this.loop = new GameLoop({
       maxDt: config.world.maxDt,
       update: (dt) => runUpdates(this.updates, dt, this.pause),
       render: () => this.renderer.render(this.scene, this.camera),
     });
-    window.addEventListener('resize', () => this.resize());
-    document.addEventListener('visibilitychange', () => this.loop.resetClock());
+    this.cleanup.listen(window, 'resize', () => this.resize());
+    this.cleanup.listen(document, 'visibilitychange', () => this.loop.resetClock());
     this.scene.add(buildWorldScene(getLayout()));
     // The camera joins the scene so the rifle parented to it gets drawn.
     this.scene.add(this.camera);
@@ -122,6 +133,7 @@ export class Game {
       flash.flash();
     });
     this.input = new Input(document, this.renderer.domElement);
+    this.cleanup.add(() => this.input.dispose());
     this.kills = new KillLog(this.events);
     this.events.on('damage', (damage) => this.results.onDamage(damage));
     this.events.on('kill', (kill) => {
@@ -273,11 +285,11 @@ export class Game {
       applyPlayerToCamera(this.camera, this.player);
     });
     applyPlayerToCamera(this.camera, this.player);
-    document.addEventListener('pointerlockchange', () =>
+    this.cleanup.listen(document, 'pointerlockchange', () =>
       this.events.emit('pointerlock', { locked: this.input.pointerLocked }),
     );
     const app = this.app;
-    mountUi(container, {
+    const unmountUi = mountUi(container, {
       events: this.events,
       player: this.player,
       pause: this.pause,
@@ -288,6 +300,7 @@ export class Game {
           return app.state;
         },
         enterMatch: () => this.enterMatch(),
+        replay: () => this.onReplay?.(),
       },
       results: () => this.results.result,
       nameOf: (id) =>
@@ -295,11 +308,31 @@ export class Game {
       weapon: this.weapon,
       inventory: this.inventory,
       zone: this.zone,
-      requestPointerLock: () => this.renderer.domElement.requestPointerLock(),
+      requestPointerLock: () => this.requestPointerLock(),
     });
+    this.cleanup.add(unmountUi);
     const fps = createFpsMeter(window.location.search, container);
     if (fps) this.addUpdate((dt) => fps.update(dt));
     this.resize();
+  }
+
+  /** Capture the mouse. The browser only allows it from a click or key press. */
+  requestPointerLock(): void {
+    this.renderer.domElement.requestPointerLock();
+  }
+
+  /**
+   * Take this game down: stop the loop, remove its listeners and page elements and free its
+   * graphics memory, so a new game can take its place with nothing left over.
+   */
+  dispose(): void {
+    if (this.cleanup.disposed) return;
+    this.renderer.setAnimationLoop(null);
+    this.cleanup.dispose();
+    disposeObject(this.scene);
+    this.renderer.dispose();
+    // The canvas, the overlay and the FPS label were all added to the container.
+    this.container.replaceChildren();
   }
 
   /** Leave the menu: the match begins and the player starts the parachute drop. */

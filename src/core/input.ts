@@ -33,13 +33,26 @@ export class Input {
     private readonly doc: InputDocument,
     private readonly element: InputElement,
   ) {
-    doc.addEventListener('keydown', (e) => this.keys.add((e as KeyboardEvent).code));
-    doc.addEventListener('keyup', (e) => this.keys.delete((e as KeyboardEvent).code));
-    doc.addEventListener('mousedown', (e) => this.buttons.add((e as MouseEvent).button));
-    doc.addEventListener('mouseup', (e) => this.buttons.delete((e as MouseEvent).button));
-    doc.addEventListener('mousemove', (e) => this.onMouseMove(e as MouseEvent));
-    doc.addEventListener('pointerlockchange', () => this.onPointerLockChange());
-    element.addEventListener('click', () => this.handleClick());
+    this.listen(doc, 'keydown', (e) => this.keys.add((e as KeyboardEvent).code));
+    this.listen(doc, 'keyup', (e) => this.keys.delete((e as KeyboardEvent).code));
+    this.listen(doc, 'mousedown', (e) => this.buttons.add((e as MouseEvent).button));
+    this.listen(doc, 'mouseup', (e) => this.buttons.delete((e as MouseEvent).button));
+    this.listen(doc, 'mousemove', (e) => this.onMouseMove(e as MouseEvent));
+    this.listen(doc, 'pointerlockchange', () => this.onPointerLockChange());
+    this.listen(element, 'click', () => this.handleClick());
+  }
+
+  private readonly removers: (() => void)[] = [];
+
+  private listen(target: EventTarget, type: string, handler: (event: Event) => void): void {
+    target.addEventListener(type, handler);
+    this.removers.push(() => target.removeEventListener(type, handler));
+  }
+
+  /** Take every listener off the page, for example when a new match replaces this one. */
+  dispose(): void {
+    for (const remove of this.removers.splice(0)) remove();
+    this.clickHandlers.clear();
   }
 
   get pointerLocked(): boolean {
