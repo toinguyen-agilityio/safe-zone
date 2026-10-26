@@ -54,6 +54,7 @@ export class ZoneDamageSystem {
         target: victim.id,
         health: result.health,
         armor: result.armor,
+        by: null,
         from: null,
       });
       if (!result.killed) continue;

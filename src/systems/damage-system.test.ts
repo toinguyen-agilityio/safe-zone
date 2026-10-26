@@ -51,7 +51,7 @@ describe('connectDamage', () => {
     const { events, damages, hit } = setup();
     events.emit('hit', hit());
     expect(damages).toEqual([
-      { target: 'bot-1', health: 25, armor: 0, from: { x: 1, y: 2, z: 3 } },
+      { target: 'bot-1', health: 25, armor: 0, by: 'player', from: { x: 1, y: 2, z: 3 } },
     ]);
   });
 

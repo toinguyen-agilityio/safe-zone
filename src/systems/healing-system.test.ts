@@ -123,7 +123,7 @@ describe('cancelling', () => {
   it('taking damage cancels it and the item is not used', () => {
     const { healing, inventory, events, system, press, ctx } = setup();
     press('Digit1');
-    events.emit('damage', { target: 'player', health: 10, armor: 0, from: null });
+    events.emit('damage', { target: 'player', health: 10, armor: 0, by: null, from: null });
     expect(healing.state).toBe('idle');
     for (let t = 0; t < 3; t += 0.1) system.update(0.1, ctx);
     expect(inventory.count('banhMi')).toBe(2);
@@ -132,7 +132,7 @@ describe('cancelling', () => {
   it('damage to someone else does not cancel it', () => {
     const { healing, events, press } = setup();
     press('Digit1');
-    events.emit('damage', { target: 'bot-1', health: 10, armor: 0, from: null });
+    events.emit('damage', { target: 'bot-1', health: 10, armor: 0, by: null, from: null });
     expect(healing.state).toBe('banhMi');
   });
 

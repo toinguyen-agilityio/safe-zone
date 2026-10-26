@@ -18,6 +18,8 @@ export interface DamageEvent {
   health: number;
   /** Taken off armor. */
   armor: number;
+  /** Who dealt it: the shooter's id, or null for the flood. */
+  by: string | null;
   /** Where the shot came from, for the damage indicator; null when unknown. */
   from: Vec3 | null;
 }
@@ -47,6 +49,7 @@ export function connectDamage(events: EventBus, world: DamageWorld): () => void 
       target: target.id,
       health: result.health,
       armor: result.armor,
+      by: hit.shooter,
       from: hit.origin,
     });
     if (!result.killed) return;

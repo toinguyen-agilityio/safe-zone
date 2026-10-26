@@ -12,6 +12,7 @@ import { connectSounds } from './audio/sound-system';
 import { Health } from './entities/health';
 import { Inventory } from './entities/inventory';
 import { AmmoSync } from './systems/ammo-sync';
+import { MatchResults } from './systems/match-stats';
 import { Healing } from './systems/healing';
 import { HealingSystem } from './systems/healing-system';
 import { Weapon } from './entities/weapon';
@@ -76,6 +77,8 @@ export class Game {
   readonly player = createParachutingPlayer(config.world.defaultSeed);
   readonly playerHealth = new Health();
   readonly kills: KillLog;
+  /** Rank, kills, damage and survival time of the player; the match ends when it is decided. */
+  readonly results = new MatchResults();
   /** The 19 opponents; they drop in together with the player. */
   readonly bots: BotSystem;
   /** The flood zone: five phases that shrink around new centers. */
@@ -120,6 +123,12 @@ export class Game {
     });
     this.input = new Input(document, this.renderer.domElement);
     this.kills = new KillLog(this.events);
+    this.events.on('damage', (damage) => this.results.onDamage(damage));
+    this.events.on('kill', (kill) => {
+      this.results.onKill(kill, this.elapsed);
+      // The match is over when the player dies or is the last one alive.
+      if (this.results.finished) this.endMatch();
+    });
     this.zone = new ZoneSystem(this.events, config.world.defaultSeed);
     this.zoneDamage = new ZoneDamageSystem({
       zone: this.zone,
