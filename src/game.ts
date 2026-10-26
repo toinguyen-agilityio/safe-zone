@@ -29,7 +29,7 @@ import { LootRenderer } from './render/loot';
 import { MuzzleFlash } from './render/muzzle-flash';
 import { TracerPool } from './render/tracer';
 import { buildCanopy, updateCanopy } from './render/parachute';
-import { createFpsMeter } from './ui/fps-meter';
+import { createFpsMeter, type FpsMeter } from './ui/fps-meter';
 import { mountUi } from './ui/mount';
 import { createRenderer } from './render/renderer';
 import { attachViewmodel, placeViewmodel } from './render/viewmodel';
@@ -98,6 +98,8 @@ export class Game {
   /** Seconds on the start screen, for the camera that flies over the river. */
   private menuTime = 0;
   private readonly loop: GameLoop;
+  /** Only there with ?fps; it is told how long each real frame took. */
+  private fpsMeter: FpsMeter | null = null;
 
   /** Everything this game set up on the page, so a new game can replace it cleanly. */
   private readonly cleanup = new Disposer();
@@ -114,6 +116,7 @@ export class Game {
     this.loop = new GameLoop({
       maxDt: config.world.maxDt,
       update: (dt) => runUpdates(this.updates, dt, this.pause),
+      onFrame: (seconds) => this.fpsMeter?.update(seconds),
       render: () => this.renderer.render(this.scene, this.camera),
     });
     this.cleanup.listen(window, 'resize', () => this.resize());
@@ -311,8 +314,7 @@ export class Game {
       requestPointerLock: () => this.requestPointerLock(),
     });
     this.cleanup.add(unmountUi);
-    const fps = createFpsMeter(window.location.search, container);
-    if (fps) this.addUpdate((dt) => fps.update(dt));
+    this.fpsMeter = createFpsMeter(window.location.search, container);
     this.resize();
   }
 

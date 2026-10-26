@@ -48,3 +48,23 @@ describe('GameLoop', () => {
     expect(renders()).toBe(2);
   });
 });
+
+describe('GameLoop onFrame', () => {
+  it('is told the real frame time even when the step is clamped', () => {
+    const frames: number[] = [];
+    const steps: number[] = [];
+    const loop = new GameLoop({
+      maxDt: 0.05,
+      update: (dt) => steps.push(dt),
+      onFrame: (s) => frames.push(s),
+      render: () => undefined,
+    });
+    loop.tick(1000);
+    loop.tick(1500);
+    loop.tick(1516);
+    expect(steps).toEqual([0, 0.05, 0.016]);
+    expect(frames[0]).toBeCloseTo(0.5);
+    expect(frames[1]).toBeCloseTo(0.016);
+    expect(frames).toHaveLength(2);
+  });
+});
