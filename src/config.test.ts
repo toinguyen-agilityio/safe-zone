@@ -5,6 +5,7 @@ describe('config', () => {
   it('defines world values', () => {
     expect(config.world.mapSize).toBe(640);
     expect(typeof config.world.defaultSeed).toBe('number');
+    expect(config.world.maxPixelRatio).toBe(1.5);
     expect(config.world.maxDt).toBe(0.05);
     expect(config.world.gridCellSize).toBeGreaterThan(0);
     expect(config.world.river.bedDepth).toBeGreaterThan(0);
