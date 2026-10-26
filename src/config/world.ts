@@ -1,0 +1,77 @@
+export const world = {
+  mapSize: 640,
+  defaultSeed: 20261023,
+  maxDt: 0.05,
+  /** The renderer draws at most this many pixels per CSS pixel, however sharp the display. */
+  maxPixelRatio: 1.5,
+  /** Side of a cell in the grid that finds nearby boxes. */
+  gridCellSize: 16,
+  streetWidth: 14,
+  /** Centers of the north-south streets (x) and east-west streets (z). */
+  streetXs: [-240, -160, -80, 0, 80, 140],
+  streetZs: [-240, -160, -80, 0, 80, 160, 240],
+  /** East-west streets stop here, before the river west bank. */
+  streetEastEnd: 150,
+  river: {
+    baseX: 220,
+    curveAmplitude: 30,
+    curveLength: 90,
+    width: 50,
+    sampleStep: 40,
+    bedDepth: 4,
+    waterLevel: -1.2,
+  },
+  houses: {
+    /** Gap kept between houses and the street edge. */
+    margin: 0.5,
+    frontageMin: 4,
+    frontageMax: 6,
+    /** Narrowest house worth building; leftovers thinner than this become empty lot. */
+    minFrontage: 3,
+    alleyWidth: 3,
+    /** An alley (kiet) crosses the block after this many houses (inclusive range). */
+    alleyEveryMin: 4,
+    alleyEveryMax: 7,
+    /** Height range (world units) of houses in the inner blocks. */
+    innerHeight: { min: 6, max: 12 },
+    /** Houses within `riverBand` of the river bank become high-rises. */
+    riverBand: 40,
+    riverHeight: { min: 25, max: 45 },
+  },
+  /** Window pattern on house walls, in world units; the same on small and large houses. */
+  windows: {
+    periodX: 3,
+    periodY: 3.5,
+    /** Fraction of a period that is window, centered in the cell. */
+    widthFraction: 0.5,
+    heightFraction: 0.5,
+    /** No windows below this height (ground floor shopfront). */
+    minHeight: 1.2,
+  },
+  /** Ground and river continue this far past the map edge so no gap shows. */
+  edgePadding: 100,
+  /** Height of the ground on land, where streets and sidewalks are. */
+  roadLevel: 0,
+  /** Walking onto a bridge surface up to this far above the feet counts as stepping onto it. */
+  stepUpHeight: 0.6,
+  bridgeDeckWidth: 16,
+  bridgeZs: { han: -120, dragon: 40, tranThiLy: 200 },
+  bridgeRampLength: 30,
+  /** Deck height above the ground, so boats and water pass below. */
+  bridgeDeckHeight: 6,
+  bridgePillarSpacing: 18,
+  bridgePillarRadius: 1.2,
+  bridgeRailingHeight: 1.1,
+  landmarks: {
+    /** Open ground kept around each landmark so no house touches it. */
+    margin: 2,
+    heights: { hanMarket: 14, cockChurch: 42, chamMuseum: 12 },
+  },
+  dragon: {
+    /** How far the dragon floats above the bridge surface. */
+    clearance: 4.5,
+    bodyRadius: 2.4,
+    headLength: 10,
+    tailLength: 15,
+  },
+} as const;

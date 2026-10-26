@@ -1,0 +1,53 @@
+.crosshair,
+.hitmarker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.crosshair {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Four short ticks around the centre, drawn as a rotated cross of two bars. */
+.hitmarker {
+  width: 26px;
+  height: 26px;
+  opacity: 0;
+  color: #fff;
+}
+
+.hitmarker::before,
+.hitmarker::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 3px;
+  background: currentColor;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+  -webkit-mask: linear-gradient(90deg, #000 0 30%, transparent 30% 70%, #000 70%);
+  mask: linear-gradient(90deg, #000 0 30%, transparent 30% 70%, #000 70%);
+}
+
+.hitmarker::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.hitmarker::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.hitmarker.hitmarker-head {
+  color: #ffd400;
+}
+
+.hitmarker.hitmarker-show {
+  opacity: 1;
+}

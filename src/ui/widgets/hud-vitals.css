@@ -1,0 +1,47 @@
+.hud-vitals {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.hud-bar {
+  position: relative;
+  height: 22px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.hud-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  transition: width 0.15s ease-out;
+}
+
+.hud-bar-health .hud-bar-fill {
+  background: #d94141;
+}
+
+.hud-bar-health.hud-low .hud-bar-fill {
+  background: #ff7a29;
+}
+
+.hud-bar-armor .hud-bar-fill {
+  background: #3a8fd9;
+}
+
+.hud-bar-label {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+  line-height: 22px;
+  font-size: 14px;
+}

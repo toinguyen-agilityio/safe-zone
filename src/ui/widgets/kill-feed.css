@@ -1,0 +1,27 @@
+.kill-feed {
+  position: absolute;
+  top: 100px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.kill-feed-line {
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.kill-feed-line.kill-feed-mine {
+  background: rgba(190, 40, 40, 0.65);
+}
+
+.kill-feed-arrow {
+  margin: 0 8px;
+  opacity: 0.8;
+}
