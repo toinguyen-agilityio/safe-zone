@@ -1,5 +1,6 @@
 import { PerspectiveCamera, Scene, type WebGLRenderer } from 'three';
 import { config } from './config';
+import { AppState } from './core/app-state';
 import { EventBus } from './core/events';
 import { GameLoop } from './core/loop';
 import { Pause, runUpdates } from './core/pause';
@@ -63,6 +64,8 @@ export class Game {
   readonly renderer: WebGLRenderer;
   private readonly updates: UpdateFn[] = [];
   readonly events = new EventBus();
+  /** The page opens in the menu; the match, with its parachute drop, starts on `enterMatch`. */
+  readonly app = new AppState(this.events);
   readonly pause = new Pause();
   readonly input: Input;
   readonly weapon = new Weapon();
@@ -202,6 +205,8 @@ export class Game {
     const canopy = buildCanopy();
     this.scene.add(canopy);
     this.addUpdate((dt) => {
+      // Nothing moves in the menu, and nothing after the match is over.
+      if (!this.app.inMatch) return;
       this.elapsed += dt;
       this.zone.update(dt);
       water.update(this.zone.current, this.elapsed);
@@ -266,6 +271,16 @@ export class Game {
     const fps = createFpsMeter(window.location.search, container);
     if (fps) this.addUpdate((dt) => fps.update(dt));
     this.resize();
+  }
+
+  /** Leave the menu: the match begins and the player starts the parachute drop. */
+  enterMatch(): boolean {
+    return this.app.enterMatch();
+  }
+
+  /** The match is over. */
+  endMatch(): boolean {
+    return this.app.endMatch();
   }
 
   addUpdate(update: UpdateFn): void {
