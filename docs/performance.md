@@ -56,3 +56,19 @@ on the real machine, in this order:
 
 If the real numbers are low, try them one at a time: hide the water plane, hide the wall, then turn
 the minimap down to a redraw every few frames.
+
+## Changes made after the first measurement
+
+- The flood water plane and the water wall are left out of the frame while the dry zone still covers the
+  whole map (the first minute of the match), since there is nothing to see (`floodVisible`).
+- The minimap is redrawn 20 times a second at most instead of on every frame.
+
+Both leave the picture as it was. In the cloud container they changed nothing that can be seen in the
+numbers: the software renderer was 6 FPS before and after, and also with the water hidden and with the HUD
+hidden, and the JavaScript side of a frame (all game updates and the render call) took about 2 ms. So the
+time is spent in the renderer, on the pixels and triangles, not in the game code. Turning the antialiasing
+off in the same test took it from 6 to 9 FPS, but that changes how the game looks, so it was left on; it
+is the first thing to try if a real laptop is short of frames.
+
+The remaining gap to 60 FPS on a real machine is **not known**: the table above still has to be filled
+in on one. Re-measure there with the steps in "How to measure" before changing anything else.

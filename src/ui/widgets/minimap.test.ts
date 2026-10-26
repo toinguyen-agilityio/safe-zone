@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getLayout } from '../../world/layout';
-import { drawMinimap, type MapContext } from './minimap';
+import { drawMinimap, REDRAW_SECONDS, redrawDue, type MapContext } from './minimap';
 
 /** A context that writes down what was drawn. */
 function recorder() {
@@ -91,5 +91,31 @@ describe('drawMinimap', () => {
     expect(calls.filter((c) => c.name === 'save')).toHaveLength(
       calls.filter((c) => c.name === 'restore').length,
     );
+  });
+});
+
+describe('redrawDue', () => {
+  it('draws the first time', () => {
+    expect(redrawDue(1000, null)).toBe(true);
+  });
+
+  it('waits until the redraw time has passed since the last draw', () => {
+    const interval = REDRAW_SECONDS * 1000;
+    expect(redrawDue(1000 + interval - 1, 1000)).toBe(false);
+    expect(redrawDue(1000 + interval, 1000)).toBe(true);
+  });
+
+  it('redraws 20 times a second at most, not on every frame of a fast screen', () => {
+    let last: number | null = null;
+    let draws = 0;
+    // One second of a 144 Hz display.
+    for (let t = 0; t < 1000; t += 1000 / 144) {
+      if (redrawDue(t, last)) {
+        last = t;
+        draws++;
+      }
+    }
+    expect(draws).toBeLessThanOrEqual(21);
+    expect(draws).toBeGreaterThanOrEqual(17);
   });
 });

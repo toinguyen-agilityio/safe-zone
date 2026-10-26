@@ -54,6 +54,14 @@ const COLORS = {
   marker: '#ffd400',
 };
 
+/** The map is redrawn this often; more is not needed to read it. */
+export const REDRAW_SECONDS = 1 / 20;
+
+/** Is it time to draw the map again? The first draw (no earlier draw) is always due. */
+export function redrawDue(nowMs: number, lastMs: number | null, seconds = REDRAW_SECONDS): boolean {
+  return lastMs === null || nowMs - lastMs >= seconds * 1000;
+}
+
 /** Step along the river when drawing its curve, in world units. */
 const RIVER_STEP = 10;
 
@@ -148,8 +156,10 @@ export function mount(ctx: UiContext): () => void {
   const g = canvas.getContext('2d');
   const layout = getLayout();
   let frame = 0;
-  const refresh = () => {
-    if (g) {
+  let lastDraw: number | null = null;
+  const refresh = (nowMs: number) => {
+    if (g && redrawDue(nowMs, lastDraw)) {
+      lastDraw = nowMs;
       g.clearRect(0, 0, size, size);
       drawMinimap(
         g,

@@ -23,7 +23,7 @@ import {
   HIP_FOV_DEGREES,
 } from './render/first-person-camera';
 import { applyMenuPose, menuCameraPose } from './render/menu-camera';
-import { createFloodWater } from './render/flood-water';
+import { createFloodWater, floodVisible } from './render/flood-water';
 import { createWaterWall } from './render/water-wall';
 import { LootRenderer } from './render/loot';
 import { MuzzleFlash } from './render/muzzle-flash';
@@ -244,8 +244,13 @@ export class Game {
       if (!this.app.inMatch) return;
       this.elapsed += dt;
       this.zone.update(dt);
-      water.update(this.zone.current, this.elapsed);
-      wall.update(this.zone.current);
+      const flooding = floodVisible(this.zone.current);
+      water.mesh.visible = flooding;
+      wall.mesh.visible = flooding;
+      if (flooding) {
+        water.update(this.zone.current, this.elapsed);
+        wall.update(this.zone.current);
+      }
       this.zoneDamage.update(dt);
       this.bots.update(dt);
       this.ai.update(dt);
