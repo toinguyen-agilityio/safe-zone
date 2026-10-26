@@ -18,7 +18,11 @@ declare module './events' {
 export class AppState {
   private current: AppPhase = 'menu';
 
-  constructor(private readonly events?: EventBus) {}
+  constructor(
+    private readonly events?: EventBus,
+    /** Asked before a match starts; a device that cannot play says no. */
+    private readonly canEnter: () => boolean = () => true,
+  ) {}
 
   get state(): AppPhase {
     return this.current;
@@ -28,8 +32,9 @@ export class AppState {
     return this.current === 'match';
   }
 
-  /** Leave the menu and start the match, with the parachute drop. Returns false if not in the menu. */
+  /** Leave the menu and start the match, with the parachute drop. Returns false if not in the menu or this device cannot play. */
   enterMatch(): boolean {
+    if (!this.canEnter()) return false;
     return this.change('menu', 'match');
   }
 

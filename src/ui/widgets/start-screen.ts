@@ -5,6 +5,7 @@ import {
   ENTER_BUTTON,
   GAME_NAME,
   TAGLINE,
+  TOUCH_NOTICE,
 } from '../text-vi';
 import type { UiContext } from '../mount';
 import './start-screen.css';
@@ -26,6 +27,18 @@ export class StartScreenController {
     this.options.hide();
     this.options.requestPointerLock();
   }
+}
+
+export interface StartScreenMode {
+  /** The enter button is shown. */
+  showButton: boolean;
+  /** The notice that takes its place, or null. */
+  notice: string | null;
+}
+
+/** On a touch device there is a notice and no way in; on a desktop there is the button. */
+export function startScreenMode(touch: boolean): StartScreenMode {
+  return touch ? { showButton: false, notice: TOUCH_NOTICE } : { showButton: true, notice: null };
 }
 
 function element<K extends keyof HTMLElementTagNameMap>(
@@ -53,7 +66,12 @@ export function mount(ctx: UiContext): () => void {
 
   const enter = element('button', 'start-screen-enter', ENTER_BUTTON);
   enter.type = 'button';
-  screen.append(title, tagline, description, controls, enter);
+  const mode = startScreenMode(Boolean(ctx.touch));
+  if (mode.showButton) screen.append(title, tagline, description, controls, enter);
+  else {
+    screen.append(title, tagline, description, controls);
+    screen.append(element('p', 'start-screen-notice', mode.notice ?? ''));
+  }
   ctx.root.appendChild(screen);
 
   const show = () => screen.classList.add('start-screen-show');

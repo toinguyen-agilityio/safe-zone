@@ -10,6 +10,11 @@ export const DESCRIPTION =
 
 export const ENTER_BUTTON = 'Vào trận';
 
+/** Shown on a touch device instead of the enter button. */
+export const TOUCH_NOTICE =
+  'Trò chơi này cần bàn phím và chuột nên chưa hỗ trợ thiết bị cảm ứng. ' +
+  'Hãy mở trên máy tính bằng Chrome để chơi.';
+
 export const CONTROLS_TITLE = 'Điều khiển';
 
 /** Each control as a key and what it does. */

@@ -12,6 +12,8 @@ export interface UiContext {
   events: EventBus;
   player: Player;
   pause: Pause;
+  /** The device has a touch screen as its main pointer, so the game is not supported. */
+  touch?: boolean;
   /** The app phase and the way into the match, for the start screen. */
   app?: {
     readonly state: 'menu' | 'match' | 'ended';
