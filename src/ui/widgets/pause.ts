@@ -58,9 +58,11 @@ export function mount(ctx: UiContext): () => void {
   });
   const onClick = () => controller.onClick();
   screen.addEventListener('click', onClick);
-  const stopListening = ctx.events.on('pointerlock', ({ locked }) =>
-    controller.onPointerLock(locked),
-  );
+  const stopListening = ctx.events.on('pointerlock', ({ locked }) => {
+    // Releasing the mouse after the match is over is not a pause.
+    if (ctx.app && ctx.app.state === 'ended') return;
+    controller.onPointerLock(locked);
+  });
 
   return () => {
     stopListening();

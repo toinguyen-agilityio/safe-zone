@@ -65,6 +65,18 @@ describe('MatchResults rank', () => {
     expect(results.result).toMatchObject({ rank: 1, won: true, kills: 19, survivalSeconds: 120 });
   });
 
+  it('remembers how the player died, and nothing for a win', () => {
+    const shot = new MatchResults();
+    shot.onKill(kill('bot-1', 'player'), 3);
+    expect(shot.result?.cause).toBe('shot');
+    const flood = new MatchResults();
+    flood.onKill(kill(null, 'player', 'flood'), 3);
+    expect(flood.result?.cause).toBe('flood');
+    const win = new MatchResults();
+    killBots(win, 19);
+    expect(win.result?.cause).toBeNull();
+  });
+
   it('is also won when the flood kills the last other player', () => {
     const results = new MatchResults();
     killBots(results, 19);
