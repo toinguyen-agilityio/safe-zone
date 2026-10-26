@@ -1,6 +1,6 @@
 import { config } from '../config';
 import type { DamageEvent } from './damage-system';
-import type { KillRecord } from './kill-log';
+import type { KillCause, KillRecord } from './kill-log';
 
 const PLAYER_ID = 'player';
 
@@ -18,6 +18,8 @@ export interface MatchSummary {
   survivalSeconds: number;
   /** The player was the last one alive. */
   won: boolean;
+  /** How the player died, or null for the winner. */
+  cause: KillCause | null;
 }
 
 /**
@@ -62,19 +64,20 @@ export class MatchResults {
     if (kill.killer === PLAYER_ID && kill.victim !== PLAYER_ID) this.kills++;
 
     if (kill.victim === PLAYER_ID) {
-      this.finish(aliveBefore, seconds, false);
+      this.finish(aliveBefore, seconds, false, kill.cause);
     } else if (this.alive === 1 && !this.dead.has(PLAYER_ID)) {
-      this.finish(1, seconds, true);
+      this.finish(1, seconds, true, null);
     }
   }
 
-  private finish(rank: number, seconds: number, won: boolean): void {
+  private finish(rank: number, seconds: number, won: boolean, cause: KillCause | null): void {
     this.summary = {
       rank,
       kills: this.kills,
       damageDealt: Math.round(this.damageDealt),
       survivalSeconds: seconds,
       won,
+      cause,
     };
   }
 }

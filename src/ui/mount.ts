@@ -2,6 +2,7 @@ import type { EventBus } from '../core/events';
 import type { Pause } from '../core/pause';
 import type { Health } from '../entities/health';
 import type { Inventory } from '../entities/inventory';
+import type { MatchSummary } from '../systems/match-stats';
 import type { Player } from '../entities/player';
 import type { Weapon } from '../entities/weapon';
 import './ui-root.css';
@@ -14,11 +15,15 @@ export interface UiContext {
   pause: Pause;
   /** The device has a touch screen as its main pointer, so the game is not supported. */
   touch?: boolean;
-  /** The app phase and the way into the match, for the start screen. */
+  /** The app phase and the way into the match, for the start and end screens. */
   app?: {
     readonly state: 'menu' | 'match' | 'ended';
     enterMatch: () => boolean;
+    /** Start another match after this one; absent until replay exists. */
+    replay?: () => void;
   };
+  /** The player's results once the match has ended, or null while it goes on. */
+  results?: () => MatchSummary | null;
   /** The display name of the player or a bot, for the kill feed. */
   nameOf?: (id: string) => string;
   /** The player's health and armor, for the HUD. */

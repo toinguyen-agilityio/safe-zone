@@ -289,6 +289,7 @@ export class Game {
         },
         enterMatch: () => this.enterMatch(),
       },
+      results: () => this.results.result,
       nameOf: (id) =>
         id === 'player' ? 'Bạn' : (this.bots.all.find((b) => b.id === id)?.name ?? id),
       weapon: this.weapon,
