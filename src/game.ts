@@ -19,6 +19,7 @@ import {
   applyPlayerToCamera,
   HIP_FOV_DEGREES,
 } from './render/first-person-camera';
+import { applyMenuPose, menuCameraPose } from './render/menu-camera';
 import { createFloodWater } from './render/flood-water';
 import { createWaterWall } from './render/water-wall';
 import { LootRenderer } from './render/loot';
@@ -89,6 +90,8 @@ export class Game {
   readonly healing: HealingSystem;
   /** Seconds of play so far, written on each kill. */
   private elapsed = 0;
+  /** Seconds on the start screen, for the camera that flies over the river. */
+  private menuTime = 0;
   private readonly loop: GameLoop;
 
   constructor(private readonly container: HTMLElement) {
@@ -205,7 +208,14 @@ export class Game {
     const canopy = buildCanopy();
     this.scene.add(canopy);
     this.addUpdate((dt) => {
-      // Nothing moves in the menu, and nothing after the match is over.
+      // In the menu the camera flies over the river; nothing else moves, and nothing after the match is over.
+      rifle.visible = this.app.state !== 'menu';
+      if (this.app.state === 'menu') {
+        canopy.visible = false;
+        this.menuTime += dt;
+        applyMenuPose(this.camera, menuCameraPose(this.menuTime));
+        return;
+      }
       if (!this.app.inMatch) return;
       this.elapsed += dt;
       this.zone.update(dt);
