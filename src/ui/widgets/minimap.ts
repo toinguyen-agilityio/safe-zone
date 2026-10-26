@@ -33,7 +33,21 @@ export interface MapView {
   yaw: number;
 }
 
+/** A circle on the ground: the dry zone now or the one it is shrinking to. */
+export interface MapCircle {
+  center: { x: number; z: number };
+  radius: number;
+}
+
+/** The two zone circles to draw. */
+export interface MapZones {
+  current: MapCircle;
+  next: MapCircle | null;
+}
+
 const COLORS = {
+  currentZone: '#4fd2ff',
+  nextZone: '#ffffff',
   ground: '#3c4a3a',
   street: '#9aa0a6',
   river: '#3f8fb5',
@@ -42,6 +56,12 @@ const COLORS = {
 
 /** Step along the river when drawing its curve, in world units. */
 const RIVER_STEP = 10;
+
+function strokeCircle(g: MapContext, circle: MapCircle, scale: number): void {
+  g.beginPath();
+  g.arc(circle.center.x * scale, circle.center.z * scale, circle.radius * scale, 0, Math.PI * 2);
+  g.stroke();
+}
 
 /**
  * Draw the map into a round window of `size` pixels. The player is in the middle and the map is
@@ -53,6 +73,7 @@ export function drawMinimap(
   view: MapView,
   size: number,
   scale: number,
+  zones: MapZones | null = null,
 ): void {
   const middle = size / 2;
   g.save();
@@ -88,6 +109,18 @@ export function drawMinimap(
     else g.lineTo(x, z * scale);
   }
   g.stroke();
+
+  if (zones) {
+    g.lineWidth = 2;
+    g.lineJoin = 'round';
+    // Where the dry zone is now, and the smaller one it is shrinking to.
+    g.strokeStyle = COLORS.currentZone;
+    strokeCircle(g, zones.current, scale);
+    if (zones.next) {
+      g.strokeStyle = COLORS.nextZone;
+      strokeCircle(g, zones.next, scale);
+    }
+  }
   g.restore();
 
   // The player's marker stays in the middle, pointing up.
@@ -118,7 +151,14 @@ export function mount(ctx: UiContext): () => void {
   const refresh = () => {
     if (g) {
       g.clearRect(0, 0, size, size);
-      drawMinimap(g, layout, ctx.player, size, scale);
+      drawMinimap(
+        g,
+        layout,
+        ctx.player,
+        size,
+        scale,
+        ctx.zone ? { current: ctx.zone.current, next: ctx.zone.next } : null,
+      );
     }
     frame = requestAnimationFrame(refresh);
   };
